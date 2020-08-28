@@ -74,6 +74,10 @@ void RellenarCartones(struct Carton cartones[],int cantCartones);
 
 void MostrarCartones(struct Carton cartones[],int cantCartones);
 
+struct Carton tieneColumna(struct Carton carton);
+
+struct Carton tieneFila(struct Carton carton);
+
 int main()
 {
     int opcion;
@@ -106,7 +110,7 @@ int main()
                        system("cls");
                        break;
 
-               case 3: jugarBolillas(bolsa,MAX);
+               case 3: jugarBolillas(bolsa);
                        system("pause");
                        system("cls");
                        break;
@@ -218,13 +222,13 @@ int CantidadDeCartones(){
 
 
 
-void jugarBolillas(int bolsaNumeros[], int max)
+void jugarBolillas(int bolsaNumeros[])
 {
-	for (int cont = 0; cont < max; cont++) //Lleno la matriz
+	for (int cont = 0; cont < MAX; cont++) //Lleno la matriz
 {
 		bolsaNumeros[cont] = cont+1;
 	}
-	for (int i = max-1; i > 0; i--) //Cambia aleatoriamente el orden de los elementos
+	for (int i = MAX-1; i > 0; i--) //Cambia aleatoriamente el orden de los elementos
     {
         int j = rand() % (i+1);
 		int aux;
@@ -233,7 +237,7 @@ void jugarBolillas(int bolsaNumeros[], int max)
 		bolsaNumeros[j] = aux;
 	}
 
-	for (int i = 0; i < max; i++) //Muestro los numeros que salen de la bolsa
+	for (int i = 0; i < MAX; i++) //Muestro los numeros que salen de la bolsa
 	{
 		printf("%d ", bolsaNumeros[i]);
 		if((i+1)%10 == 0)
@@ -282,4 +286,41 @@ void MostrarCartones(struct Carton cartones[],int cantCartones){
         MostrarCarton(cartones[i].carton);
     }
 }
-
+struct Carton tieneFila(struct Carton carton){
+    for (int f=0;f<FILA;f++){
+        //Recorre toda la fila y chequea si salio toda
+        int fila=0;
+        for (int c=0;c<COLUMNA;c++){
+            //si el numero ya salio de la bolsa
+            if(carton.carton[f][c]<1){
+                fila=fila+1;
+            }
+        }
+        //todos los numeros ya salieron de la bolsa
+        if(fila=FILA){
+            carton.fila=1;
+            return carton;
+        }
+    }
+    carton.fila=0;
+    return carton;
+}
+struct Carton tieneColumna(struct Carton carton){
+    for (int c=0;c<COLUMNA;c++){
+        //Recorre toda la columna y chequea si salio toda
+        int col=0;
+        for (int f=0;f<FILA;f++){
+            //si el numero ya salio de la bolsa
+            if(carton.carton[f][c]<1){
+                col=col+1;
+            }
+        }
+        //si todos los numeros ya salieron de la bolsa
+        if(col=COLUMNA){
+            carton.columna=1;
+            return carton;
+        }
+    }
+    carton.columna=0;
+    return carton;
+}
