@@ -8,14 +8,16 @@
 
 //Definiciones
 
-struct Carton{
+struct Carton
+{
     int carton[FILA][COLUMNA];
     int fila;
     int columna;
     int bingo;
 
 };
-struct Jugador{
+struct Jugador
+{
     int dniJugador;
     char nombreJugador[15];
     char apellidoJugador[15];
@@ -34,7 +36,7 @@ void cargarNombreJugador(char nom[], char ape[]);
 
 //PRE: los datos del jugador ya pasaron por el proceso de carga
 //POST: Muestra los datos
-void mostrarDatosJugador(double dni, char nom[], char ape[]);
+void mostrarDatosJugador(int dni, char nom[], char ape[]);
 
 //PRE:Carton tiene que estar definido.
 //POST:Se generan 3 filas y 5 columnas con numeros aleatorios sin repetir.
@@ -58,9 +60,9 @@ int CantidadDeCartones();
 //POST: Devuelve el valor ingresado por el usuario que sí cumple las condiciones
 int chequearCartones(int num);
 
-//PRE: bolsaNumeros y max tienen que estar definidos, bolsaNumeros tiene que ser de tamaño == max.
-//POST: bolsaNumeros queda lleno por numeros unicos de 0 a < max, en orden aleatorio.
-void jugarBolillas(int bolsaNumeros[], int max);
+//PRE: bolsaNumeros tiene que estar definida, tiene que ser de tamaño == MAX.
+//POST: bolsaNumeros queda lleno por numeros unicos de 0 a < MAX, en orden aleatorio.
+void jugarBolillas(int bolsaNumeros[]);
 
 //PRE: Recibe un string y verifica que contenga sólo números.
 //POST: Devuelve 0 si la condición se cumple, 1 en caso contrario.
@@ -69,6 +71,10 @@ int soloNumeros(char strg[]);
 //PRE: Recibe un string y verifica que contenga sólo letras y/o espacios.
 //POST: Devuelve 0 si la condición se cumple, 1 en caso contrario.
 int soloLetras(char strg[]);
+
+//PRE: Recibe como parametro un valor del minimo y un valor del maximo para generar el numero aleatorio
+//POST: Devuelve un unico valor entero entre mini y maxi
+int aleatorioEntre(int mini, int maxi);
 
 void RellenarCartones(struct Carton cartones[],int cantCartones);
 
@@ -80,48 +86,54 @@ struct Carton tieneFila(struct Carton carton);
 
 int main()
 {
+    srand(time(0)); //Mantener esta linea en el main, solo debe ser llamada una vez.
     int opcion;
     int bolsa[MAX];
     struct Jugador jugador;
     struct Jugador cpu;
-    do           {
-               printf("Bienvenido al Bingo! \n"
-                      "Por favor, ingrese una opcion:\n"
-                      "1: Ingresar datos del usuario\n"
-                      "2: Seleccionar carton/es\n"
-                      "3: Sacar 90 bolillas de la bolsa\n"
-                      "4: Salir\n");
+    do{
+        printf("Bienvenido al Bingo! \n"
+               "Por favor, ingrese una opcion:\n"
+               "1: Ingresar datos del usuario\n"
+               "2: Seleccionar carton/es\n"
+               "3: Sacar 90 bolillas de la bolsa\n"
+               "4: Salir\n");
 
-               scanf("%d",&opcion);
+        scanf("%d",&opcion);
 
-           switch (opcion)
-           {
-               case 1: jugador.dniJugador = cargarDni();
-                       cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
-                       mostrarDatosJugador(jugador.dniJugador,jugador.nombreJugador,jugador.apellidoJugador);
-                       system("pause");
-                       system("cls");
-                       break;
+        switch (opcion){
+        case 1:
+            jugador.dniJugador = cargarDni();
+            cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
+            mostrarDatosJugador(jugador.dniJugador,jugador.nombreJugador,jugador.apellidoJugador);
+            system("pause");
+            system("cls");
+            break;
 
-               case 2: jugador.cantCartones= CantidadDeCartones();
-                       RellenarCartones(jugador.cartones,jugador.cantCartones);
-                       MostrarCartones(jugador.cartones,jugador.cantCartones);
-                       system("pause");
-                       system("cls");
-                       break;
+        case 2:
+            jugador.cantCartones= CantidadDeCartones();
+            RellenarCartones(jugador.cartones,jugador.cantCartones);
+            MostrarCartones(jugador.cartones,jugador.cantCartones);
+            system("pause");
+            system("cls");
+            break;
 
-               case 3: jugarBolillas(bolsa);
-                       system("pause");
-                       system("cls");
-                       break;
-              case 4: printf("\n>> Usted ha salido.\n");
-                            break;
-               default: printf("\n>> ERROR! Opcion no valida, vuelva a intentarlo.\n\n");
-		system("pause");
-                        system("cls");
-                        break;
-           }
-           }while(opcion!=4);
+        case 3:
+            jugarBolillas(bolsa);
+            system("pause");
+            system("cls");
+            break;
+        case 4:
+            printf("\n>> Usted ha salido.\n");
+            break;
+        default:
+            printf("\n>> ERROR! Opcion no valida, vuelva a intentarlo.\n\n");
+            system("pause");
+            system("cls");
+            break;
+        }
+    }
+    while(opcion!=4);
     return 0;
 }
 int cargarDni(){
@@ -130,8 +142,7 @@ int cargarDni(){
     printf("Ingrese su documento: ");
     fflush(stdin);
     gets(ChDni);
-    while (soloNumeros(ChDni) != 1)
-    {
+    while (soloNumeros(ChDni) != 1){
         printf("\n>> ERROR! Solo se admiten numeros, vuelva a intentarlo.\n\n");
         fflush(stdin);
         gets(ChDni);
@@ -144,42 +155,43 @@ void cargarNombreJugador(char nom[], char ape[]){
     printf("Ingrese su nombre: ");
     fflush(stdin);
     gets(nom);
-    while (soloLetras(nom) != 1)
-    {
+    while (soloLetras(nom) != 1){
         printf("\n>> ERROR! Solo se admiten letras, vuelva a intentarlo.\n\n");
         gets(nom);
     }
     printf("Ingrese su apellido: ");
     fflush(stdin);
     gets(ape);
-        while (soloLetras(ape) != 1)
-    {
+    while (soloLetras(ape) != 1){
         printf("\n>> ERROR! Solo se admiten letras, vuelva a intentarlo.\n\n");
         gets(ape);
     }
 }
 
-void mostrarDatosJugador(double dni, char nom[], char ape[]){
-    printf("-----------------\n>>> DNI: %.0f\n>>> NOMBRE: %s\n>>> APELLIDO: %s\n-----------------\n", dni, nom, ape);
+void mostrarDatosJugador(int dni, char nom[], char ape[]){
+    printf("-----------------\n>>> DNI: %d\n>>> NOMBRE: %s\n>>> APELLIDO: %s\n-----------------\n", dni, nom, ape);
 }
 
 void RellenarCarton(int carton[][COLUMNA]){
-    srand(time(0));
     int numAl=0;
-    for (int f=0;f<FILA;f++){
-        for (int c=0;c<COLUMNA;c++){
-           do {
-                numAl=rand() % 91; //SELECCIONA UN ÚNICO VALOR ENTRE 0 Y 90
-            }while (NumerosDelCartonSinRepetir(carton,numAl)==false); //SI EL NÚMERO SE REPITE, SE GENERARÁ OTRO NÚMERO ALEATORIO EN LA CASILLA SIGUIENTE
-
+    for (int f=0; f<FILA; f++){
+        for (int c=0; c<COLUMNA; c++){
+            do{
+                numAl=aleatorioEntre(1,90); //SELECCIONA UN ÚNICO VALOR ENTRE 1 Y 90
+            }
+            while (NumerosDelCartonSinRepetir(carton,numAl)==false);  //SI EL NÚMERO SE REPITE, SE GENERARÁ OTRO NÚMERO ALEATORIO EN LA CASILLA SIGUIENTE
             carton[f][c]=numAl; //GUARDO EL NUMERO ALEATORIO EN LA MATRIZ
         }
     }
 }
-
+int aleatorioEntre(int mini, int maxi){
+        int resultado = 0;
+        resultado  =  mini + rand()%(maxi - mini + 1);
+        return resultado;
+}
 bool NumerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl){
-    for (int f=0;f<FILA;f++){
-        for (int c=0;c<COLUMNA;c++){
+    for (int f=0; f<FILA; f++){
+        for (int c=0; c<COLUMNA; c++){
             if (numAl==carton[f][c]){
                 return false;
             }
@@ -188,14 +200,15 @@ bool NumerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl){
     return true;
 }
 void MostrarCarton(int carton[][COLUMNA]){
-    for (int f=0;f<FILA;f++){
-        for (int c=0;c<COLUMNA;c++){
+    for (int f=0; f<FILA; f++){
+        for (int c=0; c<COLUMNA; c++){
             if(c==0){
                 printf("|");
             }
             if(carton[f][c]>-1){
                 printf("%d|",carton[f][c]);
-            }else{
+            }
+            else{
                 //El nuemro ya salio entonces es X
                 printf("X|");
             }
@@ -219,85 +232,71 @@ int CantidadDeCartones(){
     return cant;
 }
 
-
-
-
-void jugarBolillas(int bolsaNumeros[])
-{
-	for (int cont = 0; cont < MAX; cont++) //Lleno la matriz
-{
-		bolsaNumeros[cont] = cont+1;
-	}
-	for (int i = MAX-1; i > 0; i--) //Cambia aleatoriamente el orden de los elementos
-    {
+void jugarBolillas(int bolsaNumeros[]){
+    for (int cont = 0; cont < MAX; cont++){//Lleno la matriz
+        bolsaNumeros[cont] = cont+1;
+    }
+    for (int i = MAX-1; i > 0; i--){ //Cambia aleatoriamente el orden de los elementos
         int j = rand() % (i+1);
-		int aux;
-		aux = bolsaNumeros[i];
-		bolsaNumeros[i] = bolsaNumeros[j];
-		bolsaNumeros[j] = aux;
-	}
+        int aux;
+        aux = bolsaNumeros[i];
+        bolsaNumeros[i] = bolsaNumeros[j];
+        bolsaNumeros[j] = aux;
+    }
 
-	for (int i = 0; i < MAX; i++) //Muestro los numeros que salen de la bolsa
-	{
-		printf("%d ", bolsaNumeros[i]);
-		if((i+1)%10 == 0)
-		{
-			printf("\n");
-		}
-	}
-	printf("\n\n\n");
+    for (int i = 0; i < MAX; i++) {//Muestro los numeros que salen de la bolsa
+        printf("%d ", bolsaNumeros[i]);
+        if((i+1)%10 == 0){
+            printf("\n");
+        }
+    }
+    printf("\n\n\n");
 }
 
-int soloNumeros(char strg[])
-{
+int soloNumeros(char strg[]){
     int i=0;
-    while (strg[i] != '\0')
-    {
-        if (strg[i] < '0' || strg[i] > '9')
-        {
+    while (strg[i] != '\0'){
+        if (strg[i] < '0' || strg[i] > '9'){
             return 0;
         }
         i++;
     }
-            return 1;
+    return 1;
 }
 
-int soloLetras(char strg[])
-{
+int soloLetras(char strg[]){
     int i=0;
-    while (strg[i] != '\0')
-    {
-       if (strg[i] != ' ' && (strg[i] <'a' || strg[i] >'z') && (strg[i] < 'A' || strg[i] > 'Z'))
-    {
-        return 0;
+    while (strg[i] != '\0'){
+        if (strg[i] != ' ' && (strg[i] <'a' || strg[i] >'z') && (strg[i] < 'A' || strg[i] > 'Z')){
+            return 0;
+        }
+        i++;
     }
-    i++;
-    }
-        return 1;
+    return 1;
 }
 void RellenarCartones(struct Carton cartones[],int cantCartones){
-    for (int i=0;i<cantCartones;i++){
+    for (int i=0; i<cantCartones; i++){
         RellenarCarton(cartones[i].carton);
     }
 }
 void MostrarCartones(struct Carton cartones[],int cantCartones){
-    for (int i=0;i<cantCartones;i++){
+    for (int i=0; i<cantCartones; i++){
         printf("\nCarton %d \n",i+1);
         MostrarCarton(cartones[i].carton);
     }
 }
 struct Carton tieneFila(struct Carton carton){
-    for (int f=0;f<FILA;f++){
+    for (int f=0; f<FILA; f++){
         //Recorre toda la fila y chequea si salio toda
         int fila=0;
-        for (int c=0;c<COLUMNA;c++){
+        for (int c=0; c<COLUMNA; c++){
             //si el numero ya salio de la bolsa
             if(carton.carton[f][c]<1){
                 fila=fila+1;
             }
         }
         //todos los numeros ya salieron de la bolsa
-        if(fila=FILA){
+        if(fila==FILA){
             carton.fila=1;
             return carton;
         }
@@ -306,17 +305,17 @@ struct Carton tieneFila(struct Carton carton){
     return carton;
 }
 struct Carton tieneColumna(struct Carton carton){
-    for (int c=0;c<COLUMNA;c++){
+    for (int c=0; c<COLUMNA; c++){
         //Recorre toda la columna y chequea si salio toda
         int col=0;
-        for (int f=0;f<FILA;f++){
+        for (int f=0; f<FILA; f++){
             //si el numero ya salio de la bolsa
             if(carton.carton[f][c]<1){
                 col=col+1;
             }
         }
         //si todos los numeros ya salieron de la bolsa
-        if(col=COLUMNA){
+        if(col==COLUMNA){
             carton.columna=1;
             return carton;
         }
