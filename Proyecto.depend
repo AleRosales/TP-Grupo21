@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1594773512 source:f:\tarea 2020\programacion de computadoras\proyecto\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+
