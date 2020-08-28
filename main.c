@@ -52,7 +52,7 @@ void MostrarCarton(int carton[][COLUMNA]);
 
 //PRE:Se tiene que tipear un número entre 1 y 3.
 //POST:Se genera una cantidad de cartones acorde a lo que pidió el usuario.
-int CantidadDeCartones(struct Carton cartones[]);
+int CantidadDeCartones();
 
 //PRE: Toma el valor tipeado por el usuario y si no cumple las condiciones le hace repetir el proceso
 //POST: Devuelve el valor ingresado por el usuario que sí cumple las condiciones
@@ -69,6 +69,10 @@ int soloNumeros(char strg[]);
 //PRE: Recibe un string y verifica que contenga sólo letras y/o espacios.
 //POST: Devuelve 0 si la condición se cumple, 1 en caso contrario.
 int soloLetras(char strg[]);
+
+void RellenarCartones(struct Carton cartones[],int cantCartones);
+
+void MostrarCartones(struct Carton cartones[],int cantCartones);
 
 int main()
 {
@@ -95,7 +99,9 @@ int main()
                        system("cls");
                        break;
 
-               case 2: jugador.cantCartones= CantidadDeCartones(jugador.cartones);
+               case 2: jugador.cantCartones= CantidadDeCartones();
+                       RellenarCartones(jugador.cartones,jugador.cantCartones);
+                       MostrarCartones(jugador.cartones,jugador.cantCartones);
                        system("pause");
                        system("cls");
                        break;
@@ -180,11 +186,14 @@ bool NumerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl){
 void MostrarCarton(int carton[][COLUMNA]){
     for (int f=0;f<FILA;f++){
         for (int c=0;c<COLUMNA;c++){
+            if(c==0){
+                printf("|");
+            }
             if(carton[f][c]>-1){
-                printf("%d ",carton[f][c]);
+                printf("%d|",carton[f][c]);
             }else{
                 //El nuemro ya salio entonces es X
-                printf("X ");
+                printf("X|");
             }
         }
         printf("\n");
@@ -198,16 +207,11 @@ int chequearCartones(int num){
     }
     return num;
 }
-int CantidadDeCartones(struct Carton cartones[]){
+int CantidadDeCartones(){
     int cant,i=0;
     printf("Elija la cantidad de cartones para jugar (entre 1 a 3) \n");
     scanf("%d",&cant);
     cant = chequearCartones(cant); //Le asigno el valor que retorna el chequeo
-    for (i=0;i<cant;i++){
-        RellenarCarton(cartones[i].carton);
-        MostrarCarton(cartones[i].carton);
-        printf("\n");
-    }
     return cant;
 }
 
@@ -266,6 +270,16 @@ int soloLetras(char strg[])
     i++;
     }
         return 1;
+}
+void RellenarCartones(struct Carton cartones[],int cantCartones){
+    for (int i=0;i<cantCartones;i++){
+        RellenarCarton(cartones[i].carton);
     }
-
+}
+void MostrarCartones(struct Carton cartones[],int cantCartones){
+    for (int i=0;i<cantCartones;i++){
+        printf("\nCarton %d \n",i+1);
+        MostrarCarton(cartones[i].carton);
+    }
+}
 
