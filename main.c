@@ -84,6 +84,10 @@ struct Carton tieneColumna(struct Carton carton);
 
 struct Carton tieneFila(struct Carton carton);
 
+//PRE: bolsaNumeros[] ya esta definido y pasó el proceso de carga
+//POST: muestra en pantalla las 90 bolillas de la bolsa
+void mostrarBolsa(int bolsaNumeros[]); //muestra la funcion jugarBollias()
+
 int main()
 {
     srand(time(0)); //Mantener esta linea en el main, solo debe ser llamada una vez.
@@ -93,11 +97,11 @@ int main()
     struct Jugador cpu;
     do{
         printf("Bienvenido al Bingo! \n"
-               "Por favor, ingrese una opcion:\n"
+               "Por favor, ingrese una opci%cn:\n"
                "1: Ingresar datos del usuario\n"
                "2: Seleccionar carton/es\n"
                "3: Sacar 90 bolillas de la bolsa\n"
-               "4: Salir\n");
+               "4: Salir\n",162);
 
         scanf("%d",&opcion);
 
@@ -127,7 +131,7 @@ int main()
             printf("\n>> Usted ha salido.\n");
             break;
         default:
-            printf("\n>> ERROR! Opcion no valida, vuelva a intentarlo.\n\n");
+            printf("\n>> ERROR! Opci%cn no v%clida, vuelva a intentarlo.\n\n",162, 160);
             system("pause");
             system("cls");
             break;
@@ -143,7 +147,7 @@ int cargarDni(){
     fflush(stdin);
     gets(ChDni);
     while (soloNumeros(ChDni) != 1){
-        printf("\n>> ERROR! Solo se admiten numeros, vuelva a intentarlo.\n\n");
+        printf("\n>> ERROR! S%clo se admiten n%cmeros, vuelva a intentarlo.\n\n", 162, 163);
         fflush(stdin);
         gets(ChDni);
     }
@@ -156,14 +160,14 @@ void cargarNombreJugador(char nom[], char ape[]){
     fflush(stdin);
     gets(nom);
     while (soloLetras(nom) != 1){
-        printf("\n>> ERROR! Solo se admiten letras, vuelva a intentarlo.\n\n");
+        printf("\n>> ERROR! S%clo se admiten letras, vuelva a intentarlo.\n\n", 162);
         gets(nom);
     }
     printf("Ingrese su apellido: ");
     fflush(stdin);
     gets(ape);
     while (soloLetras(ape) != 1){
-        printf("\n>> ERROR! Solo se admiten letras, vuelva a intentarlo.\n\n");
+        printf("\n>> ERROR! S%clo se admiten letras, vuelva a intentarlo.\n\n", 162);
         gets(ape);
     }
 }
@@ -200,21 +204,39 @@ bool NumerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl){
     return true;
 }
 void MostrarCarton(int carton[][COLUMNA]){
+    //Fines esteticos
+    printf("%c", 201);
+    for(int i=0;i<24;i++){
+        printf("%c",196);
+    }
+    printf("%c\n", 187);
+
     for (int f=0; f<FILA; f++){
         for (int c=0; c<COLUMNA; c++){
             if(c==0){
-                printf("|");
+                printf("%c",179);
             }
-            if(carton[f][c]>-1){
-                printf("%d|",carton[f][c]);
-            }
-            else{
-                //El nuemro ya salio entonces es X
-                printf("X|");
-            }
+            if((carton[f][c]<10)&&(carton[f][c]>-1)){
+            //Si el carton es menor a 10 Y mayor a -1, lo muestra con un 0 adelante.
+            //Esto es simplemente para que el carton se muestre por pantalla de mejor manera
+                printf(" 0%d %c",carton[f][c],179);
+                }else if(carton[f][c]>=10) { //Si es mayor/igual a 10, se muestra sin ningun agregado
+                    printf(" %d %c",carton[f][c],179);
+                } else{
+                    //El nuemro ya salio entonces es X
+                    printf(" X %c", 179);
+                }
+
         }
         printf("\n");
     }
+
+    //Fines esteticos
+    printf("%c", 200);
+    for(int i=0;i<24;i++){
+    printf("%c",196);
+    }
+    printf("%c\n", 188);
 }
 int chequearCartones(int num){
     while((num<1) || (num>3)){
@@ -243,16 +265,39 @@ void jugarBolillas(int bolsaNumeros[]){
         bolsaNumeros[i] = bolsaNumeros[j];
         bolsaNumeros[j] = aux;
     }
+    mostrarBolsa(bolsaNumeros);
+}
+void mostrarBolsa(int bolsaNumeros[]){
+    printf("\n\t-----------> Bolsa <-----------\n");
+    //Fines esteticos
+    printf("%c", 201);
+    for(int i=0;i<49;i++){
+        printf("%c",196);
+    }
+    printf("%c\n", 187);
 
     for (int i = 0; i < MAX; i++) {//Muestro los numeros que salen de la bolsa
-        printf("%d ", bolsaNumeros[i]);
-        if((i+1)%10 == 0){
-            printf("\n");
+        if(i==0){ //Fin estetico
+            printf("%c",179);
+        }
+        if(bolsaNumeros[i]<10){
+            printf(" 0%d %c", bolsaNumeros[i], 179);
+        } else {
+            printf(" %d %c", bolsaNumeros[i],179);
+        }
+        if(((i+1)%10 == 0)&&(i!=MAX-1)){ //Para salto de linea cada 10 numeros
+        printf("\n%c",179);
+        } else if(i==MAX-1) { //Cambio estetico en la ultima pos.
+        printf("\n");
         }
     }
-    printf("\n\n\n");
+    //Fines esteticos
+    printf("%c", 200);
+    for(int i=0;i<49;i++){
+        printf("%c",196);
+    }
+    printf("%c\n", 188);
 }
-
 int soloNumeros(char strg[]){
     int i=0;
     while (strg[i] != '\0'){
@@ -281,7 +326,7 @@ void RellenarCartones(struct Carton cartones[],int cantCartones){
 }
 void MostrarCartones(struct Carton cartones[],int cantCartones){
     for (int i=0; i<cantCartones; i++){
-        printf("\nCarton %d \n",i+1);
+        printf("\n-------> Cart%cn %d <-------\n",162,i+1);
         MostrarCarton(cartones[i].carton);
     }
 }
