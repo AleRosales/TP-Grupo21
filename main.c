@@ -7,6 +7,23 @@
 #define MAX 90
 
 //Definiciones
+
+struct Carton{
+    int carton[FILA][COLUMNA];
+    int fila;
+    int columna;
+    int bingo;
+
+};
+struct Jugador{
+    int dniJugador;
+    char nombreJugador[15];
+    char apellidoJugador[15];
+    int cantCartones;
+    struct Carton cartones[3];
+    int puntos;
+};
+
 //PRE: Se debe inicializar una variable del tipo int para cargarla con el dato pedido
 //POST: Carga una variable verificando que sólo sea numérica.
 int cargarDni();
@@ -21,21 +38,21 @@ void mostrarDatosJugador(double dni, char nom[], char ape[]);
 
 //PRE:Carton tiene que estar definido.
 //POST:Se generan 3 filas y 5 columnas con numeros aleatorios sin repetir.
-void RellenarCarton(int carton[][COLUMNA],int tamFila);
+void RellenarCarton(int carton[][COLUMNA]);
 
 //PRE:Se tiene que recibir c/u de los números que rellenan el carton
 //POST:Retorna una variable true o false. Si es true, asigna un valor sin repetir a la matriz
 //Sino, vuelve a entrar en bucle hasta encontrar un número diferente al que le quiere asignar
-bool NumerosDelCartonSinRepetir(int carton[][COLUMNA],int tamFila,int numAl);
+bool NumerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl);
 
 //PRE: Cartón tiene que estar CARGADO
 //POST: Muestra por pantalla el cartón (o los cartones), saltos de
 //línea y varios
-void MostrarCarton(int carton[][COLUMNA],int tamFila);
+void MostrarCarton(int carton[][COLUMNA]);
 
 //PRE:Se tiene que tipear un número entre 1 y 3.
 //POST:Se genera una cantidad de cartones acorde a lo que pidió el usuario.
-void CantidadDeCartones(int carton[][COLUMNA]);
+int CantidadDeCartones(struct Carton cartones[]);
 
 //PRE: Toma el valor tipeado por el usuario y si no cumple las condiciones le hace repetir el proceso
 //POST: Devuelve el valor ingresado por el usuario que sí cumple las condiciones
@@ -53,21 +70,6 @@ int soloNumeros(char strg[]);
 //POST: Devuelve 0 si la condición se cumple, 1 en caso contrario.
 int soloLetras(char strg[]);
 
-struct Carton{
-    int carton[FILA][COLUMNA];
-    int fila;
-    int columna;
-    int bingo;
-
-};
-struct Jugador{
-    int dniJugador;
-    char nombreJugador[15];
-    char apellidoJugador[15];
-    int cantCartones;
-    struct Carton cartones[3];
-    int puntos;
-};
 int main()
 {
     int opcion;
@@ -93,7 +95,7 @@ int main()
                        system("cls");
                        break;
 
-               case 2: CantidadDeCartones(jugador.cartones);
+               case 2: jugador.cantCartones= CantidadDeCartones(jugador.cartones);
                        system("pause");
                        system("cls");
                        break;
@@ -151,22 +153,22 @@ void mostrarDatosJugador(double dni, char nom[], char ape[]){
     printf("-----------------\n>>> DNI: %.0f\n>>> NOMBRE: %s\n>>> APELLIDO: %s\n-----------------\n", dni, nom, ape);
 }
 
-void RellenarCarton(int carton[3][COLUMNA],int tamFila){
+void RellenarCarton(int carton[][COLUMNA]){
     srand(time(0));
     int numAl=0;
-    for (int f=0;f<tamFila;f++){
+    for (int f=0;f<FILA;f++){
         for (int c=0;c<COLUMNA;c++){
            do {
                 numAl=rand() % 91; //SELECCIONA UN ÚNICO VALOR ENTRE 0 Y 90
-            }while (NumerosDelCartonSinRepetir(carton,tamFila,numAl)==false); //SI EL NÚMERO SE REPITE, SE GENERARÁ OTRO NÚMERO ALEATORIO EN LA CASILLA SIGUIENTE
+            }while (NumerosDelCartonSinRepetir(carton,numAl)==false); //SI EL NÚMERO SE REPITE, SE GENERARÁ OTRO NÚMERO ALEATORIO EN LA CASILLA SIGUIENTE
 
             carton[f][c]=numAl; //GUARDO EL NUMERO ALEATORIO EN LA MATRIZ
         }
     }
 }
 
-bool NumerosDelCartonSinRepetir(int carton[3][COLUMNA],int tamFila,int numAl){
-    for (int f=0;f<tamFila;f++){
+bool NumerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl){
+    for (int f=0;f<FILA;f++){
         for (int c=0;c<COLUMNA;c++){
             if (numAl==carton[f][c]){
                 return false;
@@ -175,8 +177,8 @@ bool NumerosDelCartonSinRepetir(int carton[3][COLUMNA],int tamFila,int numAl){
     }
     return true;
 }
-void MostrarCarton(int carton[][COLUMNA],int tamFila){
-    for (int f=0;f<tamFila;f++){
+void MostrarCarton(int carton[][COLUMNA]){
+    for (int f=0;f<FILA;f++){
         for (int c=0;c<COLUMNA;c++){
             if(carton[f][c]>-1){
                 printf("%d ",carton[f][c]);
@@ -196,16 +198,17 @@ int chequearCartones(int num){
     }
     return num;
 }
-void CantidadDeCartones(int carton[3][COLUMNA]){
+int CantidadDeCartones(struct Carton cartones[]){
     int cant,i=0;
     printf("Elija la cantidad de cartones para jugar (entre 1 a 3) \n");
     scanf("%d",&cant);
     cant = chequearCartones(cant); //Le asigno el valor que retorna el chequeo
     for (i=0;i<cant;i++){
-        RellenarCarton(carton,FILA);
-        MostrarCarton(carton,FILA);
+        RellenarCarton(cartones[i].carton);
+        MostrarCarton(cartones[i].carton);
         printf("\n");
     }
+    return cant;
 }
 
 
