@@ -94,14 +94,33 @@ void mostrarBolsa(int bolsaNumeros[]); //muestra la funcion jugarBollias()
 //POST: Devuelve 0 si la condicion se cumple, 1 si no
 int charMayorA(char strg[], char min, char max);
 
+//PRE: Se lo llama al comienzo del main una única vez.
+//POST: Ejecuta un menu donde el usuario elije que hacer
+void menu();
+
+//PRE: char opChar debe estar inicializado y definido con el ingreso que hizo el usuario
+//POST: Verifica que se haya ingresado un numero, llamando a la funcion soloNumeros()
+//      Una vez verificado el numero, se retorna el valor entero del char que se ingresó
+int validarMenu(char opChar[]);
+
+//PRE: Se lo llama dentro del procedimiento menu(), requiere que int op se haya definido con un numero
+//POST: Ejecuta la logica del menu, donde se hacen los llamados a las demás funciones y procedimientos del menu.
+void menuLogica(int op);
+
+
 int main()
 {
-    srand(time(0)); //Mantener esta linea en el main, solo debe ser llamada una vez.
-    char opcionChar[1]; //para la opcion en char
+    menu();
+    return 0;
+}
+void menu(){
+    srand(time(0)); //Esta linea se tiene que ejecutar una sola vez al principio del programa (puede ser acá o en el main)
+    /*COMENTARIO A BORRAR-->
+    Acá opcionChar lo ideal es que sea un char solo y no un array.
+    Intenté hacer una funcion nueva, como soloNumeros que reciba un char. Pero cuando lo pruebo, se corta
+    el programa al ingresarse un número. La verdad ni idea pero así con array funciona*/
+    char opcionChar[1]; //para la opcion en char.
     int opcion; //para la opcion en int
-    int bolsa[MAX];
-    struct Jugador jugador;
-    struct Jugador cpu;
     do{
         printf("Bienvenido al Bingo! \n"
                "Por favor, ingrese una opci%cn:\n"
@@ -112,13 +131,27 @@ int main()
                "Su opci%cn: ", 162, 162);
         fflush(stdin);
         gets(opcionChar);
-        while (soloNumeros(opcionChar) != 1){ //verifico que no se hayan ingresado letras
-            printf("\n>> ERROR! S%clo se admiten n%cmeros, vuelva a intentarlo:\n\nSu opci%cn: ", 162, 163, 162);
-            fflush(stdin);
-            gets(opcionChar);
-        }
-        opcion = atoi(opcionChar); //Paso a INT la opcion que estaba en CHAR
-        switch (opcion){
+        opcion=validarMenu(opcionChar); //devuelve el valor entero de la opcion, ya validada
+        menuLogica(opcion);
+        } while(opcion!=4);
+}
+int validarMenu(char opChar[]){
+    while (soloNumeros(opChar) != 1){ //verifico que no se hayan ingresado letras
+        printf("\n>> ERROR! S%clo se admiten n%cmeros, vuelva a intentarlo:\n\nSu opci%cn: ", 162, 163, 162);
+        fflush(stdin);
+        gets(opChar);
+    }
+     int opInt = atoi(opChar); //Paso a INT la opcion que estaba en CHAR
+     return opInt;
+}
+void menuLogica(int op){
+    /*COMENTARIO A BORRAR -->
+    Estas variables son locales a menuLogica(), se podrian poner en menuEsqueleto() o en su defecto el main,
+    pero sería lo mismo, porque desde esta funcion se muestran y piden datos...son libres de cambiarlo*/
+    int bolsa[MAX];
+    struct Jugador jugador;
+    struct Jugador cpu;
+    switch (op){
         case 1:
             jugador.dniJugador = cargarDni();
             cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
@@ -149,9 +182,6 @@ int main()
             system("cls");
             break;
         }
-    }
-    while(opcion!=4);
-    return 0;
 }
 int cargarDni(){
     int dni;
@@ -186,7 +216,11 @@ void cargarNombreJugador(char nom[], char ape[]){
 }
 
 void mostrarDatosJugador(int dni, char nom[], char ape[]){
-    printf("-----------------\n>>> DNI: %d\n>>> NOMBRE: %s\n>>> APELLIDO: %s\n-----------------\n", dni, nom, ape);
+    printf("-----------------\n"
+           ">>> DNI: %d\n"
+           ">>> NOMBRE: %s\n"
+           ">>> APELLIDO: %s\n"
+           "-----------------\n", dni, nom, ape);
 }
 
 void rellenarCarton(int carton[][COLUMNA]){
