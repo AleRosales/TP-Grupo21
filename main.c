@@ -116,9 +116,13 @@ int main()
 void menu(){
     srand(time(0)); //Esta linea se tiene que ejecutar una sola vez al principio del programa (puede ser acá o en el main)
     /*COMENTARIO A BORRAR-->
-    Acá opcionChar lo ideal es que sea un char solo y no un array.
-    Intenté hacer una funcion nueva, como soloNumeros que reciba un char. Pero cuando lo pruebo, se corta
-    el programa al ingresarse un número. La verdad ni idea pero así con array funciona*/
+    Acá opcionChar[] lo ideal es que sea un char solo y no un array.
+    Hice una funcion que valide los numeros nueva, que reciba un char y no un string (como la que valida el DNI por ej.)
+    El problema es cuando llega el atoi que lo convierte en int. atoi si o si recibe un string, y como le estariamos pasando
+    un char, el programa se crashea. Solucion a medias: hacer un switch manualmente que retorne el valor entero del char. El
+    tema de eso es que que si se excede el numero y se tipea "215643", va a ingresar a la opcion 2 porque solo toma el primer numero.
+    Conclusion: lo dejamos asi y fue :)
+    <----COMENTARIO A BORRAR*/
     char opcionChar[1]; //para la opcion en char.
     int opcion; //para la opcion en int
     do{
