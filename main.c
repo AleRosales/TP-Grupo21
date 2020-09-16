@@ -40,12 +40,12 @@ void mostrarDatosJugador(int dni, char nom[], char ape[]);
 
 //PRE:Carton tiene que estar definido.
 //POST:Se generan 3 filas y 5 columnas con numeros aleatorios sin repetir.
-void rellenarCarton(int carton[][COLUMNA]);
+void rellenarCartonAleatorio(int carton[][COLUMNA]);
 
 //PRE:Se tiene que recibir c/u de los números que rellenan el carton
 //POST:Retorna una variable true o false. Si es true, asigna un valor sin repetir a la matriz
 //Sino, vuelve a entrar en bucle hasta encontrar un número diferente al que le quiere asignar
-bool numerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl);
+bool numerosDelCartonSinRepetir(int carton[][COLUMNA],int num);
 
 //PRE: Cartón tiene que estar CARGADO
 //POST: Muestra por pantalla el cartón (o los cartones), saltos de
@@ -76,8 +76,12 @@ int soloLetras(char strg[]);
 //POST: Devuelve un unico valor entero entre mini y maxi
 int aleatorioEntre(int mini, int maxi);
 
-void rellenarCartones(struct Carton cartones[],int cantCartones);
+//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligió, que ya debe estar seleccionada.
+//POST: Ejecuta una iteracion la misma cantidad de veces como cartones elegidos, llamando cada vez a rellenarCartonAleatorio().
+void rellenarCartonesAleatorio(struct Carton cartones[],int cantCartones);
 
+//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligió, que ya debe estar seleccionada.
+//POST: Ejecuta una iteracion la misma cantidad de veces como cartones elegidos, llamando cada vez a mostrarCarton().
 void mostrarCartones(struct Carton cartones[],int cantCartones);
 
 struct Carton tieneColumna(struct Carton carton);
@@ -88,25 +92,44 @@ struct Carton tieneFila(struct Carton carton);
 //POST: muestra en pantalla las 90 bolillas de la bolsa
 void mostrarBolsa(int bolsaNumeros[]); //muestra la funcion jugarBollias()
 
-//PRE: Se le pasa por paramtero un string y dos elementos para saber si el string encuentra entre los mismos
-//     Al ser strings, lo que compara son posiciones dentro de la tabla de ASCII, y como los
-//     numeros en dicha tabla están todos juntos, es posible compararlos facilmente con ese método
-//POST: Devuelve 0 si la condicion se cumple, 1 si no
-int charMayorA(char strg[], char min, char max);
-
 //PRE: Se lo llama al comienzo del main una única vez.
 //POST: Ejecuta un menu donde el usuario elije que hacer
 void menu();
 
-//PRE: char opChar debe estar inicializado y definido con el ingreso que hizo el usuario
+//PRE: char numChar debe estar inicializado y definido con el ingreso que hizo el usuario
 //POST: Verifica que se haya ingresado un numero, llamando a la funcion soloNumeros()
 //      Una vez verificado el numero, se retorna el valor entero del char que se ingresó
-int validarMenu(char opChar[]);
+int validarNum(char numChar[]);
 
 //PRE: Se lo llama dentro del procedimiento menu(), requiere que int op se haya definido con un numero
 //POST: Ejecuta la logica del menu, donde se hacen los llamados a las demás funciones y procedimientos del menu.
-void menuLogica(int op);
+void menuEjecucion(int op);
 
+//PRE: Se lo llama dentro de la funcion rellenarCartonesManual
+//     Se le pasa como parametro una matriz dentro de la struct Carton
+//POST: Pide al usuario el ingreso de los numeros seleccionados para el carton
+//      LLama a otras funciones para verificar que se cumplan las condiciones correspondientes
+void rellenarCartonManual(int carton[][COLUMNA]);
+
+//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligió, que ya debe estar seleccionada.
+//POST: Ejecuta una iteracion la misma cantidad de veces como cartones elegidos, llamando cada vez a rellenarCartonManual().
+void rellenarCartonesManual(struct Carton cartones[],int cantCartones);
+
+//PRE: Se ejecuta luego de preguntarle al usuario la cantidad de cartones a jugar.
+//     cantCartones debe estar definido
+//POST: Muestra un menu donde se elige si se quiere jugar aleatoriamente o manualmente.
+//      Valida las entradas del usuario.
+void subMenuCargarCartones(struct Carton cartones[],int cantCartones);
+
+//PRE: Se ejecuta dentro de la funcion subMenuCargarCartones.
+//     int Opcion corresponde a la opcion que selecciona el usuario en la funcion padre.
+//POST: Ejecuta un switch que llama a otros procedimientos correspondientes.
+void subMenuCargarCartonesEjecucion(struct Carton cartones[],int cantCartones, int opcion);
+
+//PRE: Se le pasa un valor (num) el cual se va a verificar que exista entre el valor min y el valor max.
+//POST: Retorna 1 si num se encuentra en los parametros establecidos.
+//      Retorna 0 si num no se encuentra en los parametros establecidos.
+int validarNumerosEntre (int num,int min, int max);
 
 int main()
 {
@@ -135,22 +158,22 @@ void menu(){
                "Su opci%cn: ", 162, 162);
         fflush(stdin);
         gets(opcionChar);
-        opcion=validarMenu(opcionChar); //devuelve el valor entero de la opcion, ya validada
-        menuLogica(opcion);
+        opcion=validarNum(opcionChar); //devuelve el valor entero de la opcion, ya validada
+        menuEjecucion(opcion);
         } while(opcion!=4);
 }
-int validarMenu(char opChar[]){
-    while (soloNumeros(opChar) != 1){ //verifico que no se hayan ingresado letras
+int validarNum(char numChar[]){
+    while (soloNumeros(numChar) != 1){ //verifico que no se hayan ingresado letras
         printf("\n>> ERROR! S%clo se admiten n%cmeros, vuelva a intentarlo:\n\nSu opci%cn: ", 162, 163, 162);
         fflush(stdin);
-        gets(opChar);
+        gets(numChar);
     }
-     int opInt = atoi(opChar); //Paso a INT la opcion que estaba en CHAR
-     return opInt;
+     int numInt = atoi(numChar); //Paso a INT la opcion que estaba en CHAR
+     return numInt;
 }
-void menuLogica(int op){
+void menuEjecucion(int op){
     /*COMENTARIO A BORRAR -->
-    Estas variables son locales a menuLogica(), se podrian poner en menuEsqueleto() o en su defecto el main,
+    Estas variables son locales a menuEjecucion(), se podrian poner en menuEsqueleto() o en su defecto el main,
     pero sería lo mismo, porque desde esta funcion se muestran y piden datos...son libres de cambiarlo*/
     int bolsa[MAX];
     struct Jugador jugador;
@@ -165,8 +188,8 @@ void menuLogica(int op){
             break;
 
         case 2:
-            jugador.cantCartones= cantidadDeCartones();
-            rellenarCartones(jugador.cartones,jugador.cantCartones);
+            jugador.cantCartones = cantidadDeCartones();
+            subMenuCargarCartones(jugador.cartones,jugador.cantCartones);
             mostrarCartones(jugador.cartones,jugador.cantCartones);
             system("pause");
             system("cls");
@@ -227,7 +250,7 @@ void mostrarDatosJugador(int dni, char nom[], char ape[]){
            "-----------------\n", dni, nom, ape);
 }
 
-void rellenarCarton(int carton[][COLUMNA]){
+void rellenarCartonAleatorio(int carton[][COLUMNA]){
     int numAl=0;
     for (int f=0; f<FILA; f++){
         for (int c=0; c<COLUMNA; c++){
@@ -239,15 +262,71 @@ void rellenarCarton(int carton[][COLUMNA]){
         }
     }
 }
+void subMenuCargarCartones(struct Carton cartones[],int cantCartones){
+    char opcionChar[1];
+    int opInt;
+    do{
+        printf("\n\t%cQu%c desea hacer?\n"
+               "\t\t1 - Cargar Cartones Manualmente.\n"
+               "\t\t2 - Cargar Cartones Aleatoriamente\n\t> Su Opci%cn: ",168,130,162);
+        fflush(stdin);
+        gets(opcionChar);
+        opInt=validarNum(opcionChar);
+        if((validarNumerosEntre(opInt, 1,2)!=1)){
+            printf("\n\t>> ERROR! Seleccione 1 o 2.\n");
+        }
+    } while((validarNumerosEntre(opInt, 1,2)!=1));
+    subMenuCargarCartonesEjecucion(cartones, cantCartones, opInt);
+}
+void subMenuCargarCartonesEjecucion(struct Carton cartones[],int cantCartones, int opcion){
+    switch(opcion){
+        case 1:
+            rellenarCartonesManual(cartones, cantCartones);
+            break;
+        case 2:
+             rellenarCartonesAleatorio(cartones,cantCartones);
+             break;
+        default:
+            printf("\n>> ERROR! Opci%cn no v%clida, vuelva a intentarlo.\n\n",162, 160);
+            system("pause");
+            system("cls");
+            break;
+    }
+}
+void rellenarCartonesManual(struct Carton cartones[],int cantCartones){
+    for (int i=0; i<cantCartones; i++){
+        printf("\n-----> Rellenando Manualmente Cart%cn Nro. %d <-----\n",162,i+1);
+        rellenarCartonManual(cartones[i].carton);
+    }
+}
+void rellenarCartonManual(int carton[][COLUMNA]){
+    int num;
+    for(int f=0; f<FILA; f++){
+        for(int c=0; c<COLUMNA; c++){
+            do{
+            printf("\tIngrese n%cmero [COL: %d][FIL: %d]: ",163, c+1, f+1);
+            scanf("%d", &num);
+                if(numerosDelCartonSinRepetir(carton, num)==false){
+                    printf("\n>> ERROR! No se pueden repetir los n%cmeros. Vuelva a internarlo.\n",163);
+                }
+                if(validarNumerosEntre(num, 1, 90)!=1){
+                    printf("\n>> ERROR! El n%cmero no debe ser menor a 1 ni mayor a 90. Vuelva a internarlo.\n", 163);
+                }
+            }while ((numerosDelCartonSinRepetir(carton, num)==false)||(validarNumerosEntre(num, 1, 90)!=1)); //Si no se cumple cualquiera de las dos, se vuelve a iterar
+            carton[f][c] = num; //Si pasa la validacion, se asigna el numero
+        }
+        printf("\n");
+    }
+}
 int aleatorioEntre(int mini, int maxi){
         int resultado = 0;
         resultado  =  mini + rand()%(maxi - mini + 1);
         return resultado;
 }
-bool numerosDelCartonSinRepetir(int carton[][COLUMNA],int numAl){
+bool numerosDelCartonSinRepetir(int carton[][COLUMNA],int n){
     for (int f=0; f<FILA; f++){
         for (int c=0; c<COLUMNA; c++){
-            if (numAl==carton[f][c]){
+            if (n==carton[f][c]){
                 return false;
             }
         }
@@ -291,27 +370,37 @@ void mostrarCarton(int carton[][COLUMNA]){
 }
 int chequearCartones(char numChar[]){
     int num = 0;
-    while(charMayorA(numChar, '1', '3') !=1){
-        //No hace falta chequear si si ingresó una letra porque ya chequeando que no sea 1, 2 o 3 basta.
-        printf("\n>> ERROR! EL N%cMERO DEBE SER ENTRE 1 Y 3. \n>> NO SE DEBEN INGRESAR LETRAS\n",233);
-        printf("Vuelva a elegir la cantidad de cartones para jugar (entre 1 a 3) \n\n");
-        fflush(stdin);
-       gets(numChar);
+    num=validarNum(numChar);
+    if(num<1||num>3){
+        printf("\n>> ERROR! Seleccion una cantidad entre 1 y 3.\n");
     }
-    num = atoi(numChar); //convierto el char a int
+    while(num<1||num>3){
+
+    }
     return num;
 }
 int cantidadDeCartones(){
-    int cant,i=0;
+    int cant;
     char cantChar[1];
     //Tomo el dato en char para verificar que no se inserten letras, luego se pasa a int mediante atoi()
-    printf("\n>> Elija la cantidad de cartones para jugar (entre 1 a 3) \n");
-    fflush(stdin);
-    gets(cantChar);
-    cant = chequearCartones(cantChar); //Le asigno el valor que retorna el chequeo
+    do{
+        printf("\n>> Elija la cantidad de cartones para jugar (entre 1 a 3) \n");
+        fflush(stdin);
+        gets(cantChar);
+        cant = validarNum(cantChar); //Le asigno el valor que retorna el chequeo
+        if(validarNumerosEntre(cant, 1,3)!=1){
+        printf("\n>> ERROR! Seleccion una cantidad entre 1 y 3.\n");
+        }
+    }while(validarNumerosEntre(cant, 1,3)!=1);
     return cant;
 }
-
+int validarNumerosEntre (int num,int min, int max){
+    if((num>=min)&&(num<=max)){
+        return 1;
+    } else{
+        return 0;
+    }
+}
 void jugarBolillas(int bolsaNumeros[]){
     for (int cont = 0; cont < MAX; cont++){//Lleno la matriz
         bolsaNumeros[cont] = cont+1;
@@ -366,17 +455,6 @@ int soloNumeros(char strg[]){
     }
     return 1;
 }
-int charMayorA(char strg[], char min, char max){
-    int i=0;
-    while (strg[i] != '\0'){
-        if (strg[i] < min || strg[i] > max){
-            return 0;
-        }
-        i++;
-    }
-    return 1;
-}
-
 int soloLetras(char strg[]){
     int i=0;
     while (strg[i] != '\0'){
@@ -387,9 +465,9 @@ int soloLetras(char strg[]){
     }
     return 1;
 }
-void rellenarCartones(struct Carton cartones[],int cantCartones){
+void rellenarCartonesAleatorio(struct Carton cartones[],int cantCartones){
     for (int i=0; i<cantCartones; i++){
-        rellenarCarton(cartones[i].carton);
+        rellenarCartonAleatorio(cartones[i].carton);
     }
 }
 void mostrarCartones(struct Carton cartones[],int cantCartones){
