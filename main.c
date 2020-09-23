@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdbool.h>
+#include <windows.h>
 #define COLUMNA 5
 #define FILA 3
 #define MAX 90
@@ -11,6 +12,7 @@
 struct Carton
 {
     int carton[FILA][COLUMNA];
+    int cartonCheck[FILA][COLUMNA];
     int fila;
     int columna;
     int bingo;
@@ -60,10 +62,6 @@ int cantidadDeCartones();
 //POST: Devuelve el valor ingresado por el usuario que sí cumple las condiciones
 int chequearCartones(char numChar[]);
 
-//PRE: bolsaNumeros tiene que estar definida, tiene que ser de tamaño == MAX.
-//POST: bolsaNumeros queda lleno por numeros unicos de 0 a < MAX, en orden aleatorio.
-void jugarBolillas(int bolsaNumeros[]);
-
 //PRE: Recibe un string y verifica que contenga sólo números.
 //POST: Devuelve 0 si la condición se cumple, 1 en caso contrario.
 int soloNumeros(char strg[]);
@@ -88,9 +86,25 @@ struct Carton tieneColumna(struct Carton carton);
 
 struct Carton tieneFila(struct Carton carton);
 
+//PRE: El usuario eligio la cantidad de cartones, basado en eso llena los cartones del CPU
+//POST: Genero los numeros del carton para la struct cpu
+void generarCpu(struct Jugador jugador);
+
+//PRE: bolsaNumeros tiene que estar definida, tiene que ser de tamaño == MAX.
+//POST: bolsaNumeros queda lleno por numeros unicos de 0 a < MAX, en orden aleatorio.
+void jugarBolillas(int bolsaNumeros[]);
+
 //PRE: bolsaNumeros[] ya esta definido y pasó el proceso de carga
 //POST: muestra en pantalla las 90 bolillas de la bolsa
-void mostrarBolsa(int bolsaNumeros[]); //muestra la funcion jugarBollias()
+void mostrarBolsa(int bolsaNumeros[]);
+
+//PRE: Ambas struct deben estar completas (jugador/cpu cartones.carton), bolsa numeros generado
+//POST: Si el numero en la coordenada carton[FILA][COLUMNA] esta en bolsaNumeros, en cartonCheck[FILA][COLUMNA] va a poner un 1.
+void checkAciertos(struct Jugador jugador, int numCartones, int numerosBolsa[]);
+
+//PRE: Recibe dos int como parametro
+//POST: Devuelve 1 si son iguales, 0 si son distintos
+int compararNumeros(int num1, int num2);
 
 //PRE: Se lo llama al comienzo del main una única vez.
 //POST: Ejecuta un menu donde el usuario elije que hacer
@@ -100,10 +114,6 @@ void menu();
 //POST: Verifica que se haya ingresado un numero, llamando a la funcion soloNumeros()
 //      Una vez verificado el numero, se retorna el valor entero del char que se ingresó
 int validarNum(char numChar[]);
-
-//PRE: Se lo llama dentro del procedimiento menu(), requiere que int op se haya definido con un numero
-//POST: Ejecuta la logica del menu, donde se hacen los llamados a las demás funciones y procedimientos del menu.
-void menuEjecucion(int op);
 
 //PRE: Se lo llama dentro de la funcion rellenarCartonesManual
 //     Se le pasa como parametro una matriz dentro de la struct Carton
@@ -121,16 +131,14 @@ void rellenarCartonesManual(struct Carton cartones[],int cantCartones);
 //      Valida las entradas del usuario.
 void subMenuCargarCartones(struct Carton cartones[],int cantCartones);
 
-//PRE: Se ejecuta dentro de la funcion subMenuCargarCartones.
-//     int Opcion corresponde a la opcion que selecciona el usuario en la funcion padre.
-//POST: Ejecuta un switch que llama a otros procedimientos correspondientes.
-void subMenuCargarCartonesEjecucion(struct Carton cartones[],int cantCartones, int opcion);
-
 //PRE: Se le pasa un valor (num) el cual se va a verificar que exista entre el valor min y el valor max.
 //POST: Retorna 1 si num se encuentra en los parametros establecidos.
 //      Retorna 0 si num no se encuentra en los parametros establecidos.
 int validarNumerosEntre (int num,int min, int max);
 
+//PRE: La matriz carton debe estar declarada
+//POST: Llena la matriz con 0, para así realizar la busqueda de numeros repetidos sin analizar basura.
+void inicializarVacio(int carton[][COLUMNA]);
 int main()
 {
     menu();
@@ -148,6 +156,10 @@ void menu(){
     <----COMENTARIO A BORRAR*/
     char opcionChar[1]; //para la opcion en char.
     int opcion; //para la opcion en int
+    int bolsa[MAX];
+    struct Jugador jugador;
+    struct Jugador cpu;
+
     do{
         printf("Bienvenido al Bingo! \n"
                "Por favor, ingrese una opci%cn:\n"
@@ -159,26 +171,8 @@ void menu(){
         fflush(stdin);
         gets(opcionChar);
         opcion=validarNum(opcionChar); //devuelve el valor entero de la opcion, ya validada
-        menuEjecucion(opcion);
-        } while(opcion!=4);
-}
-int validarNum(char numChar[]){
-    while (soloNumeros(numChar) != 1){ //verifico que no se hayan ingresado letras
-        printf("\n>> ERROR! S%clo se admiten n%cmeros, vuelva a intentarlo:\n\nSu opci%cn: ", 162, 163, 162);
-        fflush(stdin);
-        gets(numChar);
-    }
-     int numInt = atoi(numChar); //Paso a INT la opcion que estaba en CHAR
-     return numInt;
-}
-void menuEjecucion(int op){
-    /*COMENTARIO A BORRAR -->
-    Estas variables son locales a menuEjecucion(), se podrian poner en menuEsqueleto() o en su defecto el main,
-    pero sería lo mismo, porque desde esta funcion se muestran y piden datos...son libres de cambiarlo*/
-    int bolsa[MAX];
-    struct Jugador jugador;
-    struct Jugador cpu;
-    switch (op){
+
+    switch (opcion){
         case 1:
             jugador.dniJugador = cargarDni();
             cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
@@ -196,7 +190,18 @@ void menuEjecucion(int op){
             break;
 
         case 3:
+			cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
+			generarCpu(cpu); //Genera los cartones de la maquina.
+			
+			printf("Cartones del jugador: \n");
+			mostrarCartones(jugador.cartones,jugador.cantCartones);
+			
             jugarBolillas(bolsa);
+            //mostrarBolsa(bolsa);
+            
+            checkAciertos(jugador, jugador.cantCartones, bolsa);
+			checkAciertos(cpu, cpu.cantCartones, bolsa);            
+                        
             system("pause");
             system("cls");
             break;
@@ -209,7 +214,18 @@ void menuEjecucion(int op){
             system("cls");
             break;
         }
+    } while(opcion!=4);
 }
+int validarNum(char numChar[]){
+    while (soloNumeros(numChar) != 1){ //verifico que no se hayan ingresado letras
+        printf("\n>> ERROR! S%clo se admiten n%cmeros, vuelva a intentarlo:\n\nSu opci%cn: ", 162, 163, 162);
+        fflush(stdin);
+        gets(numChar);
+    }
+     int numInt = atoi(numChar); //Paso a INT la opcion que estaba en CHAR
+     return numInt;
+}
+
 int cargarDni(){
     int dni;
     char ChDni[25];
@@ -276,10 +292,7 @@ void subMenuCargarCartones(struct Carton cartones[],int cantCartones){
             printf("\n\t>> ERROR! Seleccione 1 o 2.\n");
         }
     } while((validarNumerosEntre(opInt, 1,2)!=1));
-    subMenuCargarCartonesEjecucion(cartones, cantCartones, opInt);
-}
-void subMenuCargarCartonesEjecucion(struct Carton cartones[],int cantCartones, int opcion){
-    switch(opcion){
+    switch(opInt){
         case 1:
             rellenarCartonesManual(cartones, cantCartones);
             break;
@@ -301,6 +314,7 @@ void rellenarCartonesManual(struct Carton cartones[],int cantCartones){
 }
 void rellenarCartonManual(int carton[][COLUMNA]){
     int num;
+    inicializarVacio(carton); //Inicializa en 0 al para comparar bien los numeros al momento de ingresar
     for(int f=0; f<FILA; f++){
         for(int c=0; c<COLUMNA; c++){
             do{
@@ -323,6 +337,15 @@ int aleatorioEntre(int mini, int maxi){
         resultado  =  mini + rand()%(maxi - mini + 1);
         return resultado;
 }
+
+void inicializarVacio(int carton[][COLUMNA]){
+    for (int f=0; f<FILA; f++){
+            for (int c=0; c<COLUMNA; c++){
+              carton[f][c]=0;
+            }
+        }
+}
+
 bool numerosDelCartonSinRepetir(int carton[][COLUMNA],int n){
     for (int f=0; f<FILA; f++){
         for (int c=0; c<COLUMNA; c++){
@@ -401,6 +424,7 @@ int validarNumerosEntre (int num,int min, int max){
         return 0;
     }
 }
+
 void jugarBolillas(int bolsaNumeros[]){
     for (int cont = 0; cont < MAX; cont++){//Lleno la matriz
         bolsaNumeros[cont] = cont+1;
@@ -412,39 +436,69 @@ void jugarBolillas(int bolsaNumeros[]){
         bolsaNumeros[i] = bolsaNumeros[j];
         bolsaNumeros[j] = aux;
     }
-    mostrarBolsa(bolsaNumeros);
 }
-void mostrarBolsa(int bolsaNumeros[]){
-    printf("\n\t-----------> Bolsa <-----------\n");
-    //Fines esteticos
-    printf("%c", 201);
-    for(int i=0;i<49;i++){
-        printf("%c",196);
-    }
-    printf("%c\n", 187);
 
-    for (int i = 0; i < MAX; i++) {//Muestro los numeros que salen de la bolsa
-        if(i==0){ //Fin estetico
-            printf("%c",179);
-        }
-        if(bolsaNumeros[i]<10){
-            printf(" 0%d %c", bolsaNumeros[i], 179);
-        } else {
-            printf(" %d %c", bolsaNumeros[i],179);
-        }
-        if(((i+1)%10 == 0)&&(i!=MAX-1)){ //Para salto de linea cada 10 numeros
-        printf("\n%c",179);
-        } else if(i==MAX-1) { //Cambio estetico en la ultima pos.
-        printf("\n");
-        }
-    }
-    //Fines esteticos
-    printf("%c", 200);
-    for(int i=0;i<49;i++){
-        printf("%c",196);
-    }
-    printf("%c\n", 188);
+void mostrarBolsa(int bolsaNumeros[]){
+
+	printf("Los numeros son:\n");
+	for (int i = 0; i < MAX; i++)
+	{
+		printf("%d ", bolsaNumeros[i]);
+		
+		//CAMBIAR PARA ENTREGA, esta asi para hacer correr mas rapido cuando querramos ver algo.
+		//Sleep(1000);
+		//printf("\b\b\b");
+	}
 }
+
+void generarCpu(struct Jugador cpu){
+	rellenarCartonesAleatorio(cpu.cartones, cpu.cantCartones);
+}
+
+
+//Si alguno tiene una mejor forma o mas prolija para esto, bienvenido sea.
+void checkAciertos(struct Jugador jugador, int cantCartones, int numerosBolsa[]){
+	
+	for(int i = 1; i <= cantCartones; i++) //Inicializo el vector para marcar los aciertos en 0
+        {
+            inicializarVacio(jugador.cartones[i].cartonCheck);
+		}
+		
+	for(int cart = 1; cart <= cantCartones; cart++)
+	{
+		for(int fil = 0; fil <= FILA; fil++)
+		{
+			for(int col = 0; col <= COLUMNA; col++)
+			{
+				for(int pos = 0; pos <= MAX; pos++)
+				{
+					if (compararNumeros(jugador.cartones[cart].carton[fil][col], numerosBolsa[pos]) == 1)
+					{
+							jugador.cartones[cart].cartonCheck[fil][col] = 1;
+					}
+				}				
+			}
+		}
+	}	
+	
+/*Para chequear que se guarda en el vector cartonCheck
+	for(int i = 1; i <= cantCartones; i++)
+        {
+            mostrarCarton(jugador.cartones[i].cartonCheck);
+		}
+*/			
+}
+
+int compararNumeros(int num1, int num2)
+{
+	int resultado = 0;
+	if (num1 == num2)
+	{
+		resultado = 1;
+	}
+	return resultado;
+}
+
 int soloNumeros(char strg[]){
     int i=0;
     while (strg[i] != '\0'){
