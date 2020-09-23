@@ -197,7 +197,7 @@ void menu(){
 			mostrarCartones(jugador.cartones,jugador.cantCartones);
 			
             jugarBolillas(bolsa);
-            //mostrarBolsa(bolsa);
+            mostrarBolsa(bolsa);
             
             checkAciertos(jugador, jugador.cantCartones, bolsa);
 			checkAciertos(cpu, cpu.cantCartones, bolsa);            
@@ -439,16 +439,35 @@ void jugarBolillas(int bolsaNumeros[]){
 }
 
 void mostrarBolsa(int bolsaNumeros[]){
+    printf("\n\t-----------> Bolsa <-----------\n");
+    //Fines esteticos
+    printf("%c", 201);
+    	for(int i=0;i<49;i++){
+        	printf("%c",196);
+    	}
+    printf("%c\n", 187);
 
-	printf("Los numeros son:\n");
-	for (int i = 0; i < MAX; i++)
-	{
-		printf("%d ", bolsaNumeros[i]);
-		
-		//CAMBIAR PARA ENTREGA, esta asi para hacer correr mas rapido cuando querramos ver algo.
-		//Sleep(1000);
-		//printf("\b\b\b");
-	}
+    for (int i = 0; i < MAX; i++) {//Muestro los numeros que salen de la bolsa
+        	if(i==0){ //Fin estetico
+            	printf("%c",179);
+        	}
+        	if(bolsaNumeros[i]<10){
+            	printf(" 0%d %c", bolsaNumeros[i], 179);
+        	} else {
+            	printf(" %d %c", bolsaNumeros[i],179);
+        	}
+        	if(((i+1)%10 == 0)&&(i!=MAX-1)){ //Para salto de linea cada 10 numeros
+        		printf("\n%c",179);
+        	} else if(i==MAX-1) { //Cambio estetico en la ultima pos.
+        	printf("\n");
+        	}
+    }
+    //Fines esteticos
+    printf("%c", 200);
+    	for(int i=0;i<49;i++){
+        	printf("%c",196);
+    	}
+    printf("%c\n", 188);
 }
 
 void generarCpu(struct Jugador cpu){
