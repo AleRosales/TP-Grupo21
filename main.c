@@ -96,11 +96,11 @@ void jugarBolillas(int bolsaNumeros[]);
 
 //PRE: bolsaNumeros[] ya esta definido y pasó el proceso de carga
 //POST: muestra en pantalla las 90 bolillas de la bolsa
-void mostrarBolsa(int bolsaNumeros[]);
+void mostrarBolsa(int bolsaNumeros[],int hasta);
 
 //PRE: Ambas struct deben estar completas (jugador/cpu cartones.carton), bolsa numeros generado
-//POST: Si el numero en la coordenada carton[FILA][COLUMNA] esta en bolsaNumeros, en cartonCheck[FILA][COLUMNA] va a poner un 1.
-void checkAciertos(struct Jugador jugador, int numCartones, int numerosBolsa[]);
+//POST: Si el numero en la coordenada carton[FILA][COLUMNA] esta en bolsaNumeros, en cartonCheck[FILA][COLUMNA] va a poner un -1.
+void checkAciertos(struct Jugador *jugador, int numCartones, int numeroBolsa);
 
 //PRE: Recibe dos int como parametro
 //POST: Devuelve 1 si son iguales, 0 si son distintos
@@ -139,6 +139,11 @@ int validarNumerosEntre (int num,int min, int max);
 //PRE: La matriz carton debe estar declarada
 //POST: Llena la matriz con 0, para así realizar la busqueda de numeros repetidos sin analizar basura.
 void inicializarVacio(int carton[][COLUMNA]);
+
+//PRE:
+//POST: Puntos y ganador de la partida
+void Jugar();
+
 int main()
 {
     menu();
@@ -166,7 +171,8 @@ void menu(){
                "1: Ingresar datos del usuario\n"
                "2: Seleccionar carton/es\n"
                "3: Sacar 90 bolillas de la bolsa\n"
-               "4: Salir\n\n"
+               "4: Jugar\n"
+               "5: Salir\n\n"
                "Su opci%cn: ", 162, 162);
         fflush(stdin);
         gets(opcionChar);
@@ -192,20 +198,21 @@ void menu(){
         case 3:
 			cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
 			generarCpu(cpu); //Genera los cartones de la maquina.
-			
+
 			printf("Cartones del jugador: \n");
 			mostrarCartones(jugador.cartones,jugador.cantCartones);
-			
+
             jugarBolillas(bolsa);
-            mostrarBolsa(bolsa);
-            
-            checkAciertos(jugador, jugador.cantCartones, bolsa);
-			checkAciertos(cpu, cpu.cantCartones, bolsa);            
-                        
+            mostrarBolsa(bolsa,MAX);
+
             system("pause");
             system("cls");
             break;
         case 4:
+            //printf("\n>> Usted ha salido.\n");
+            Jugar(bolsa,jugador,cpu);
+            break;
+        case 5:
             printf("\n>> Usted ha salido.\n");
             break;
         default:
@@ -370,15 +377,15 @@ void mostrarCarton(int carton[][COLUMNA]){
                 printf("%c",179);
             }
             if((carton[f][c]<10)&&(carton[f][c]>-1)){
-            //Si el carton es menor a 10 Y mayor a -1, lo muestra con un 0 adelante.
-            //Esto es simplemente para que el carton se muestre por pantalla de mejor manera
+                //Si el carton es menor a 10 Y mayor a -1, lo muestra con un 0 adelante.
+                //Esto es simplemente para que el carton se muestre por pantalla de mejor manera
                 printf(" 0%d %c",carton[f][c],179);
-                }else if(carton[f][c]>=10) { //Si es mayor/igual a 10, se muestra sin ningun agregado
-                    printf(" %d %c",carton[f][c],179);
-                } else{
-                    //El nuemro ya salio entonces es X
-                    printf(" X %c", 179);
-                }
+            }else if(carton[f][c]>=10) { //Si es mayor/igual a 10, se muestra sin ningun agregado
+                printf(" %d %c",carton[f][c],179);
+            } else{
+                //El nuemro ya salio entonces es xx
+                printf(" xx %c", 179);
+            }
 
         }
         printf("\n");
@@ -438,7 +445,7 @@ void jugarBolillas(int bolsaNumeros[]){
     }
 }
 
-void mostrarBolsa(int bolsaNumeros[]){
+void mostrarBolsa(int bolsaNumeros[],int hasta){
     printf("\n\t-----------> Bolsa <-----------\n");
     //Fines esteticos
     printf("%c", 201);
@@ -447,7 +454,7 @@ void mostrarBolsa(int bolsaNumeros[]){
     	}
     printf("%c\n", 187);
 
-    for (int i = 0; i < MAX; i++) {//Muestro los numeros que salen de la bolsa
+    for (int i = 0; i < hasta; i++) {//Muestro los numeros que salen de la bolsa
         	if(i==0){ //Fin estetico
             	printf("%c",179);
         	}
@@ -456,9 +463,9 @@ void mostrarBolsa(int bolsaNumeros[]){
         	} else {
             	printf(" %d %c", bolsaNumeros[i],179);
         	}
-        	if(((i+1)%10 == 0)&&(i!=MAX-1)){ //Para salto de linea cada 10 numeros
+        	if(((i+1)%10 == 0)&&(i!=hasta-1)){ //Para salto de linea cada 10 numeros
         		printf("\n%c",179);
-        	} else if(i==MAX-1) { //Cambio estetico en la ultima pos.
+        	} else if(i==hasta-1) { //Cambio estetico en la ultima pos.
         	printf("\n");
         	}
     }
@@ -476,36 +483,21 @@ void generarCpu(struct Jugador cpu){
 
 
 //Si alguno tiene una mejor forma o mas prolija para esto, bienvenido sea.
-void checkAciertos(struct Jugador jugador, int cantCartones, int numerosBolsa[]){
-	
-	for(int i = 1; i <= cantCartones; i++) //Inicializo el vector para marcar los aciertos en 0
-        {
-            inicializarVacio(jugador.cartones[i].cartonCheck);
-		}
-		
-	for(int cart = 1; cart <= cantCartones; cart++)
+void checkAciertos(struct Jugador *jugador, int cantCartones, int numeroBolsa){
+
+	for(int cart = 0; cart <= cantCartones; cart++)
 	{
 		for(int fil = 0; fil <= FILA; fil++)
 		{
 			for(int col = 0; col <= COLUMNA; col++)
 			{
-				for(int pos = 0; pos <= MAX; pos++)
-				{
-					if (compararNumeros(jugador.cartones[cart].carton[fil][col], numerosBolsa[pos]) == 1)
-					{
-							jugador.cartones[cart].cartonCheck[fil][col] = 1;
-					}
-				}				
+                if (compararNumeros(jugador->cartones[cart].carton[fil][col],numeroBolsa) == 1)
+                {
+                        jugador->cartones[cart].carton[fil][col] = -1;
+                }
 			}
 		}
-	}	
-	
-/*Para chequear que se guarda en el vector cartonCheck
-	for(int i = 1; i <= cantCartones; i++)
-        {
-            mostrarCarton(jugador.cartones[i].cartonCheck);
-		}
-*/			
+	}
 }
 
 int compararNumeros(int num1, int num2)
@@ -586,4 +578,32 @@ struct Carton tieneColumna(struct Carton carton){
     }
     carton.columna=0;
     return carton;
+}
+void Jugar(){
+        int bolsa[MAX];
+        struct Jugador jugador;
+        struct Jugador cpu;
+        system("cls");
+        printf("----A JUGAR----\n");
+        //datos del jugador
+        jugador.dniJugador = cargarDni();
+        cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
+        jugador.cantCartones = cantidadDeCartones();
+        //cartones
+        subMenuCargarCartones(jugador.cartones,jugador.cantCartones);
+        mostrarCartones(jugador.cartones,jugador.cantCartones);
+
+        cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
+		generarCpu(cpu); //Genera los cartones de la maquina.
+        //carga la bolsa
+        jugarBolillas(bolsa);
+        for(int i=0;i<MAX;i++){
+            system("cls");
+            printf("Jugada nro:%d\n",i+1);
+            mostrarBolsa(bolsa,i+1);
+            checkAciertos(&jugador, jugador.cantCartones, bolsa[i]);
+			checkAciertos(&cpu, cpu.cantCartones, bolsa[i]);
+            mostrarCartones(jugador.cartones,jugador.cantCartones);
+            system("pause");
+        }
 }
