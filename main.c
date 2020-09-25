@@ -144,6 +144,11 @@ void inicializarVacio(int carton[][COLUMNA]);
 //POST: Puntos y ganador de la partida
 void Jugar();
 
+int puntajes(struct Jugador j, int cantCart);
+int checkColumna(int c[FILA][COLUMNA]);
+int checkFila(int c[FILA][COLUMNA]);
+int checkBingo(int c[FILA][COLUMNA]);
+
 int main()
 {
     menu();
@@ -209,7 +214,6 @@ void menu(){
             system("cls");
             break;
         case 4:
-            //printf("\n>> Usted ha salido.\n");
             Jugar(bolsa,jugador,cpu);
             break;
         case 5:
@@ -221,7 +225,7 @@ void menu(){
             system("cls");
             break;
         }
-    } while(opcion!=4);
+    } while(opcion!=5);
 }
 int validarNum(char numChar[]){
     while (soloNumeros(numChar) != 1){ //verifico que no se hayan ingresado letras
@@ -384,7 +388,7 @@ void mostrarCarton(int carton[][COLUMNA]){
                 printf(" %d %c",carton[f][c],179);
             } else{
                 //El nuemro ya salio entonces es xx
-                printf(" xx %c", 179);
+                printf(" XX %c", 179);
             }
 
         }
@@ -484,7 +488,6 @@ void generarCpu(struct Jugador cpu){
 
 //Si alguno tiene una mejor forma o mas prolija para esto, bienvenido sea.
 void checkAciertos(struct Jugador *jugador, int cantCartones, int numeroBolsa){
-
 	for(int cart = 0; cart <= cantCartones; cart++)
 	{
 		for(int fil = 0; fil <= FILA; fil++)
@@ -583,6 +586,10 @@ void Jugar(){
         int bolsa[MAX];
         struct Jugador jugador;
         struct Jugador cpu;
+
+        jugador.puntos = 0;
+        cpu.puntos = 0;
+
         system("cls");
         printf("----A JUGAR----\n");
         //datos del jugador
@@ -594,7 +601,10 @@ void Jugar(){
         mostrarCartones(jugador.cartones,jugador.cantCartones);
 
         cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
-		generarCpu(cpu); //Genera los cartones de la maquina.
+
+        rellenarCartonesAleatorio(cpu.cartones, cpu.cantCartones);
+        //GENERAR CPU DA PROBLEMAS, MEJOR SACARLO
+        //generarCpu(cpu); //Genera los cartones de la maquina.
         //carga la bolsa
         jugarBolillas(bolsa);
         for(int i=0;i<MAX;i++){
@@ -602,8 +612,94 @@ void Jugar(){
             printf("Jugada nro:%d\n",i+1);
             mostrarBolsa(bolsa,i+1);
             checkAciertos(&jugador, jugador.cantCartones, bolsa[i]);
-			checkAciertos(&cpu, cpu.cantCartones, bolsa[i]);
+            checkAciertos(&cpu, cpu.cantCartones, bolsa[i]);
+
+            printf("\n-------Cartones Jugador-------\n");
             mostrarCartones(jugador.cartones,jugador.cantCartones);
-            system("pause");
+            jugador.puntos=puntajes(jugador, jugador.cantCartones);
+            printf("\n\tPUNTAJE JUGADOR: %d\n", jugador.puntos);
+
+            printf("\n-------Cartones CPU-------\n");
+            mostrarCartones(cpu.cartones, cpu.cantCartones);
+            cpu.puntos=puntajes(cpu, cpu.cantCartones);
+            printf("\n\tPUNTAJE CPU: %d\n", cpu.puntos);
+            /*
+            Cuando trato de chequear si ya se hizo bingo, como para terminar la jugada, casi siempre me tira el error "call stack"
+            o el "Segmentation fault". Segun google estos errores son casi siempre por el mal uso de punteros o porque el programa
+            quiere apuntar a un lugar donde no puede acceder. Pero el codigo es bastante básico, no use punteros ni nada y solo pasa cuando
+            descomento el if de abajo.
+            */
+
+//          if((checkBingo(jugador.cartones[i].carton)!=0)||(checkBingo(cpu.cartones[i].carton)!=0)){ //NO FUNCIONA
+//              printf("\n>>> PARTIDA FINALIZADA.\n");
+//              int cantJugadas = i+1;
+//              break;
+//            }
+
+               system("pause");
+
+            }
+}
+int puntajes(struct Jugador j, int cantCart){
+    int flagColum=0;
+    int flagFil=0;
+    int flagBingo=0;
+    int puntaje=0;
+
+    for(int i=0; i<cantCart; i++){
+        if((checkColumna(j.cartones[i].carton)==1)&&(flagColum==0)){
+            flagColum=1;
+            puntaje+=10;
         }
+        if((checkFila(j.cartones[i].carton)==1)&&(flagFil==0)){
+            flagFil=1;
+            puntaje+=20;
+        }
+        if((checkBingo(j.cartones[i].carton)==1)&&(flagBingo==0)){
+            flagBingo=1;
+            puntaje+=70;
+        }
+    }
+    return puntaje;
+}
+int checkColumna(int c[FILA][COLUMNA]){
+    int contadorColum = 0;
+    for(int fil=0; fil<FILA; fil++){
+        for(int col=0; col<COLUMNA; col++){
+            if(c[fil][col]==-1){
+                contadorColum++; //Cuento la cantidad de aciertos por columna
+            }
+            if(contadorColum==5){
+                return 1;
+            }
+        }
+        contadorColum=0; //Reinicio el contador porque no se ha completado una columna
+    }
+    return 0;
+}
+int checkFila(int c[FILA][COLUMNA]){
+    int contadorFila = 0;
+    for(int col=0; col<COLUMNA; col++){
+        for(int fil=0; fil<FILA; fil++){
+            if(c[fil][col]==-1){
+                contadorFila++; //Cuento la cantidad de aciertos por fila
+            }
+            if(contadorFila == 3){
+                return 1;
+            }
+        }
+        contadorFila=0; //Reinicio el contador porque no se ha completado una fila
+    }
+    return 0;
+}
+int checkBingo(int c[FILA][COLUMNA]){
+    int contadorBingo = 0;
+    for(int fil=0; fil<FILA; fil++){
+        for(int col=0; col<COLUMNA; col++){
+            if(c[fil][col]!=-1){ //SOLUCIONAR: A veces el debugger tira error de "call stack" acá. A veces no. Tambien tira "Segmentation fault", googlié pero no sé como solucionarlo
+                return 0; //Como en el bingo todos los valores deben ser -1, al primero que no sea, corta la funcion.
+            }
+        }
+    }
+    return 1;
 }
