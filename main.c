@@ -144,11 +144,18 @@ void inicializarVacio(int carton[][COLUMNA]);
 //POST: Puntos y ganador de la partida
 void Jugar();
 
-float puntajeParcial(struct Jugador j, int cantCart);
+float puntajeParcialAutomaticoCPU(struct Jugador c);
 int checkColumna(int c[FILA][COLUMNA]);
 int checkFila(int c[FILA][COLUMNA]);
 int checkBingo(int c[FILA][COLUMNA]);
 float multiplicarPuntos(float puntaje, int cantBolillas);
+int cantarLinea(struct Jugador j, int flag);
+int cantarColumna(struct Jugador j, int flag);
+int cantarBingo(struct Jugador j, int flag);
+float puntajeColumna(float p);
+float puntajeFila(float p);
+float puntajeBingo(float p);
+
 
 int main()
 {
@@ -591,6 +598,10 @@ void Jugar(){
     jugador.puntos = 0;
     cpu.puntos = 0;
 
+    int flagLinea = 0;
+    int flagColumna = 0;
+    int flagBingo = 0;
+
     system("cls");
     printf("----A JUGAR----\n");
     //datos del jugador
@@ -618,47 +629,141 @@ void Jugar(){
 
             printf("\n<<<< Cartones Jugador >>>>\n");
             mostrarCartones(jugador.cartones,jugador.cantCartones);
-            jugador.puntos=puntajeParcial(jugador, jugador.cantCartones);
-            printf("\n>PUNTAJE PARCIAL JUGADOR: %.2f\n", jugador.puntos);
 
             printf("\n<<<< Cartones CPU >>>>\n");
             mostrarCartones(cpu.cartones, cpu.cantCartones);
-            cpu.puntos=puntajeParcial(cpu, cpu.cantCartones);
-            printf("\n>PUNTAJE PARCIAL CPU: %.2f\n", cpu.puntos);
+            cpu.puntos=puntajeParcialAutomaticoCPU(cpu);
 
-            if((checkBingo(jugador.cartones[j].carton)==1)){
-                printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador.nombreJugador, jugador.apellidoJugador);
-                cantJugadas = i+1;
-                jugador.puntos = multiplicarPuntos(jugador.puntos, cantJugadas);
-                printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador.puntos);
-                break; //Corta la iteracion
-            } else if((checkBingo(cpu.cartones[j].carton)==1)){
+            //Para la CPU, los puntajes son automaticos
+            //Para el usuario, se debe cantar linea/columna/bingo manualmente.
+            if(checkBingo(cpu.cartones[j].carton)==1){
                 printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <CPU>\n");
                 cantJugadas = i+1;
                 cpu.puntos = multiplicarPuntos(cpu.puntos, cantJugadas);
                 printf(">PUNTAJE FINAL CPU: %.2f\n", cpu.puntos);
                 break; //Corta la itearcion
             }
-            system("pause");
+
+            int opcion = 0;
+            printf("\n0 - CONTINUAR JUGADA\n" //Quiza modificar esto para que sea mejor, más comodo
+                    "1 - Cantar Linea\n"
+                    "2 - Cantar Columna\n"
+                    "3 - Cantar Bingo\n"
+                    "4 - Mostrar puntaje parcial\n");
+            scanf("%d", &opcion);
+            switch(opcion){
+                case 0:
+                break;
+                case 1:
+                    system("cls");
+                    flagLinea=cantarLinea(jugador, flagLinea);
+                    if(flagLinea==1){
+                        jugador.puntos=puntajeFila(jugador.puntos);
+                    } else{
+                        i--;
+                    }
+                    system("pause");
+                    break;
+                case 2:
+                    system("cls");
+                    flagColumna=cantarColumna(jugador, flagColumna);
+                    if(flagColumna==1){
+                        jugador.puntos=puntajeColumna(jugador.puntos);
+                    } else {
+                        i--;
+                    }
+                    system("pause");
+                    break;
+                case 3:
+                    system("cls");
+                    flagBingo=cantarBingo(jugador, flagBingo);
+                    if(flagBingo==1){
+                        jugador.puntos=puntajeBingo(jugador.puntos);
+                        cantJugadas = i+1;
+                        jugador.puntos = multiplicarPuntos(jugador.puntos, cantJugadas);
+                        printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador.nombreJugador, jugador.apellidoJugador);
+                        printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador.puntos);//Ponerlo en otro lugar
+                    } else {
+                        i--;
+                    }
+                    system("pause");
+                    break;
+                case 4:
+                    system("cls");
+                    printf("\nPUNTAJE PARCIAL JUGADOR: %.2f"
+                            "\nPUNTAJE PARCIAL CPU: %.2f\n", jugador.puntos, cpu.puntos);
+                    system("pause");
+                    break;
+                }
         }
     }
 }
-float puntajeParcial(struct Jugador j, int cantCart){
+
+int cantarLinea(struct Jugador j, int flag){
+    for(int i=0; i<j.cantCartones; i++){
+        if((checkFila(j.cartones[i].carton)==1)&&(flag==0)){
+            printf(">>Felicidades, ha cantado linea!!\n");
+            flag = 1;
+        } else if ((checkFila(j.cartones[i].carton)==1)&&(flag==1)){
+            printf(">>Usted ya ha cantado linea.\n");
+        } else if(checkFila(j.cartones[i].carton)!=1){
+            printf(">>Usted no puede cantar linea todavia.\n");
+        }
+    }
+    return flag;
+}
+int cantarColumna(struct Jugador j, int flag){
+    for(int i=0; i<j.cantCartones; i++){
+        if((checkColumna(j.cartones[i].carton)==1)&&(flag==0)){
+            printf(">>Felicidades, ha cantado columna!!\n");
+            flag = 1;
+        } else if ((checkColumna(j.cartones[i].carton)==1)&&(flag==1)){
+            printf(">>Usted ya ha cantado columna.\n");
+        } else if(checkColumna(j.cartones[i].carton)!=1){
+            printf(">>Usted no puede cantar columna todavia.\n");
+        }
+    }
+    return flag;
+}
+int cantarBingo(struct Jugador j, int flag){
+    for(int i=0; i<j.cantCartones; i++){
+        if((checkBingo(j.cartones[i].carton)==1)&&(flag==0)){
+            printf(">>Felicidades, ha cantado bingo!!\n");
+            flag = 1;
+        } else if ((checkBingo(j.cartones[i].carton)==1)&&(flag==1)){
+            printf(">>Usted ya ha cantado bingo.\n");
+        } else if(checkBingo(j.cartones[i].carton)!=1){
+            printf(">>Usted no puede cantar bingo todavia.\n");
+        }
+    }
+    return flag;
+}
+float puntajeColumna(float p){
+    return p+=10;
+}
+float puntajeFila(float p){
+    return p+=20;
+}
+float puntajeBingo(float p){
+    return p+=70;
+}
+
+float puntajeParcialAutomaticoCPU(struct Jugador c){
     int flagColum=0;
     int flagFil=0;
     int flagBingo=0;
     float puntaje=0;
 
-    for(int i=0; i<cantCart; i++){
-        if((checkColumna(j.cartones[i].carton)==1)&&(flagColum==0)){
+    for(int i=0; i<c.cantCartones; i++){
+        if((checkColumna(c.cartones[i].carton)==1)&&(flagColum==0)){
             flagColum=1;
             puntaje+=10;
         }
-        if((checkFila(j.cartones[i].carton)==1)&&(flagFil==0)){
+        if((checkFila(c.cartones[i].carton)==1)&&(flagFil==0)){
             flagFil=1;
             puntaje+=20;
         }
-        if((checkBingo(j.cartones[i].carton)==1)&&(flagBingo==0)){
+        if((checkBingo(c.cartones[i].carton)==1)&&(flagBingo==0)){
             flagBingo=1;
             puntaje+=70;
         }
@@ -696,7 +801,6 @@ int checkFila(int c[FILA][COLUMNA]){
     return 0;
 }
 int checkBingo(int c[FILA][COLUMNA]){
-    int contadorBingo = 0;
     for(int fil=0; fil<FILA; fil++){
         for(int col=0; col<COLUMNA; col++){
             if(c[fil][col]!=-1){
