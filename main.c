@@ -25,7 +25,7 @@ struct Jugador
     char apellidoJugador[15];
     int cantCartones;
     struct Carton cartones[3];
-    int puntos;
+    float puntos;
 };
 
 //PRE: Se debe inicializar una variable del tipo int para cargarla con el dato pedido
@@ -144,10 +144,11 @@ void inicializarVacio(int carton[][COLUMNA]);
 //POST: Puntos y ganador de la partida
 void Jugar();
 
-int puntajes(struct Jugador j, int cantCart);
+float puntajeParcial(struct Jugador j, int cantCart);
 int checkColumna(int c[FILA][COLUMNA]);
 int checkFila(int c[FILA][COLUMNA]);
 int checkBingo(int c[FILA][COLUMNA]);
+float multiplicarPuntos(float puntaje, int cantBolillas);
 
 int main()
 {
@@ -583,68 +584,70 @@ struct Carton tieneColumna(struct Carton carton){
     return carton;
 }
 void Jugar(){
-        int bolsa[MAX];
-        struct Jugador jugador;
-        struct Jugador cpu;
+    int bolsa[MAX];
+    struct Jugador jugador;
+    struct Jugador cpu;
+    int cantJugadas = 0;
+    jugador.puntos = 0;
+    cpu.puntos = 0;
 
-        jugador.puntos = 0;
-        cpu.puntos = 0;
+    system("cls");
+    printf("----A JUGAR----\n");
+    //datos del jugador
+    jugador.dniJugador = cargarDni();
+    cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
+    jugador.cantCartones = cantidadDeCartones();
+    //cartones
+    subMenuCargarCartones(jugador.cartones,jugador.cantCartones);
+    mostrarCartones(jugador.cartones,jugador.cantCartones);
 
-        system("cls");
-        printf("----A JUGAR----\n");
-        //datos del jugador
-        jugador.dniJugador = cargarDni();
-        cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
-        jugador.cantCartones = cantidadDeCartones();
-        //cartones
-        subMenuCargarCartones(jugador.cartones,jugador.cantCartones);
-        mostrarCartones(jugador.cartones,jugador.cantCartones);
+    cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
 
-        cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
-
-        rellenarCartonesAleatorio(cpu.cartones, cpu.cantCartones);
-        //GENERAR CPU DA PROBLEMAS, MEJOR SACARLO
-        //generarCpu(cpu); //Genera los cartones de la maquina.
-        //carga la bolsa
-        jugarBolillas(bolsa);
-        for(int i=0;i<MAX;i++){
+    rellenarCartonesAleatorio(cpu.cartones, cpu.cantCartones);
+    //GENERAR CPU DA PROBLEMAS, MEJOR SACARLO
+    //generarCpu(cpu); //Genera los cartones de la maquina.
+    //carga la bolsa
+    jugarBolillas(bolsa);
+    for(int j=0; j<jugador.cantCartones; j++){
+        for(int i=0; i<MAX; i++){
             system("cls");
             printf("Jugada nro:%d\n",i+1);
             mostrarBolsa(bolsa,i+1);
             checkAciertos(&jugador, jugador.cantCartones, bolsa[i]);
             checkAciertos(&cpu, cpu.cantCartones, bolsa[i]);
 
-            printf("\n-------Cartones Jugador-------\n");
+            printf("\n<<<< Cartones Jugador >>>>\n");
             mostrarCartones(jugador.cartones,jugador.cantCartones);
-            jugador.puntos=puntajes(jugador, jugador.cantCartones);
-            printf("\n\tPUNTAJE JUGADOR: %d\n", jugador.puntos);
+            jugador.puntos=puntajeParcial(jugador, jugador.cantCartones);
+            printf("\n>PUNTAJE PARCIAL JUGADOR: %.2f\n", jugador.puntos);
 
-            printf("\n-------Cartones CPU-------\n");
+            printf("\n<<<< Cartones CPU >>>>\n");
             mostrarCartones(cpu.cartones, cpu.cantCartones);
-            cpu.puntos=puntajes(cpu, cpu.cantCartones);
-            printf("\n\tPUNTAJE CPU: %d\n", cpu.puntos);
-            /*
-            Cuando trato de chequear si ya se hizo bingo, como para terminar la jugada, casi siempre me tira el error "call stack"
-            o el "Segmentation fault". Segun google estos errores son casi siempre por el mal uso de punteros o porque el programa
-            quiere apuntar a un lugar donde no puede acceder. Pero el codigo es bastante básico, no use punteros ni nada y solo pasa cuando
-            descomento el if de abajo.
-            */
+            cpu.puntos=puntajeParcial(cpu, cpu.cantCartones);
+            printf("\n>PUNTAJE PARCIAL CPU: %.2f\n", cpu.puntos);
 
-//          if((checkBingo(jugador.cartones[i].carton)!=0)||(checkBingo(cpu.cartones[i].carton)!=0)){ //NO FUNCIONA
-//              printf("\n>>> PARTIDA FINALIZADA.\n");
-//              int cantJugadas = i+1;
-//              break;
-//            }
-
-               system("pause");
-
+            if((checkBingo(jugador.cartones[j].carton)==1)){
+                printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador.nombreJugador, jugador.apellidoJugador);
+                cantJugadas = i+1;
+                jugador.puntos = multiplicarPuntos(jugador.puntos, cantJugadas);
+                printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador.puntos);
+                break; //Corta la iteracion
+            } else if((checkBingo(cpu.cartones[j].carton)==1)){
+                printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <CPU>\n");
+                cantJugadas = i+1;
+                cpu.puntos = multiplicarPuntos(cpu.puntos, cantJugadas);
+                printf(">PUNTAJE FINAL CPU: %.2f\n", cpu.puntos);
+                break; //Corta la itearcion
             }
+            system("pause");
+        }
+    }
 }
-int puntajes(struct Jugador j, int cantCart){
+float puntajeParcial(struct Jugador j, int cantCart){
     int flagColum=0;
     int flagFil=0;
     int flagBingo=0;
-    int puntaje=0;
+    float puntaje=0;
 
     for(int i=0; i<cantCart; i++){
         if((checkColumna(j.cartones[i].carton)==1)&&(flagColum==0)){
@@ -696,10 +699,20 @@ int checkBingo(int c[FILA][COLUMNA]){
     int contadorBingo = 0;
     for(int fil=0; fil<FILA; fil++){
         for(int col=0; col<COLUMNA; col++){
-            if(c[fil][col]!=-1){ //SOLUCIONAR: A veces el debugger tira error de "call stack" acá. A veces no. Tambien tira "Segmentation fault", googlié pero no sé como solucionarlo
+            if(c[fil][col]!=-1){
                 return 0; //Como en el bingo todos los valores deben ser -1, al primero que no sea, corta la funcion.
             }
         }
     }
     return 1;
+}
+float multiplicarPuntos(float puntaje, int cantBolillas){
+    if(cantBolillas<30){
+        puntaje=puntaje*2;
+    } else if(cantBolillas>=30&&cantBolillas<50){
+        puntaje=puntaje*1.7;
+    } else if(cantBolillas>=50&&cantBolillas<=70){
+        puntaje=puntaje*1.5;
+    }
+    return puntaje;
 }
