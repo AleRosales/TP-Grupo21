@@ -142,7 +142,7 @@ void inicializarVacio(int carton[][COLUMNA]);
 
 //PRE:
 //POST: Puntos y ganador de la partida
-void Jugar();
+void jugar();
 
 float puntajeParcialAutomaticoCPU(struct Jugador c);
 int checkColumna(int c[FILA][COLUMNA]);
@@ -159,11 +159,11 @@ float puntajeBingo(float p);
 
 int main()
 {
+    srand(time(0));
     menu();
     return 0;
 }
 void menu(){
-    srand(time(0)); //Esta linea se tiene que ejecutar una sola vez al principio del programa (puede ser acá o en el main)
     /*COMENTARIO A BORRAR-->
     Acá opcionChar[] lo ideal es que sea un char solo y no un array.
     Hice una funcion que valide los numeros nueva, que reciba un char y no un string (como la que valida el DNI por ej.)
@@ -174,57 +174,31 @@ void menu(){
     <----COMENTARIO A BORRAR*/
     char opcionChar[1]; //para la opcion en char.
     int opcion; //para la opcion en int
-    int bolsa[MAX];
-    struct Jugador jugador;
-    struct Jugador cpu;
 
     do{
-        printf("Bienvenido al Bingo! \n"
-               "Por favor, ingrese una opci%cn:\n"
-               "1: Ingresar datos del usuario\n"
-               "2: Seleccionar carton/es\n"
-               "3: Sacar 90 bolillas de la bolsa\n"
-               "4: Jugar\n"
-               "5: Salir\n\n"
-               "Su opci%cn: ", 162, 162);
+        printf("BIENVENIDO AL BINGO!\n"
+               "-------------------------------\n"
+               "> Por favor, ingrese una opci%cn:\n"
+                "\t1 - Jugar\n"
+                "\t2 - Ver historial de puntajes (no esta listo todavia)\n" //Para cuando tengamos el archivo, si no hay puntajes muestra un mensaje que dice que todavia no se ha jugado
+                "\t3 - Salir\n\n"
+                "Su opci%cn: ", 162, 162);
         fflush(stdin);
         gets(opcionChar);
         opcion=validarNum(opcionChar); //devuelve el valor entero de la opcion, ya validada
 
     switch (opcion){
         case 1:
-            jugador.dniJugador = cargarDni();
-            cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
-            mostrarDatosJugador(jugador.dniJugador,jugador.nombreJugador,jugador.apellidoJugador);
+            system("cls");
+            jugar();
             system("pause");
             system("cls");
             break;
-
         case 2:
-            jugador.cantCartones = cantidadDeCartones();
-            subMenuCargarCartones(jugador.cartones,jugador.cantCartones);
-            mostrarCartones(jugador.cartones,jugador.cantCartones);
             system("pause");
             system("cls");
             break;
-
         case 3:
-			cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
-			generarCpu(cpu); //Genera los cartones de la maquina.
-
-			printf("Cartones del jugador: \n");
-			mostrarCartones(jugador.cartones,jugador.cantCartones);
-
-            jugarBolillas(bolsa);
-            mostrarBolsa(bolsa,MAX);
-
-            system("pause");
-            system("cls");
-            break;
-        case 4:
-            Jugar(bolsa,jugador,cpu);
-            break;
-        case 5:
             printf("\n>> Usted ha salido.\n");
             break;
         default:
@@ -233,7 +207,7 @@ void menu(){
             system("cls");
             break;
         }
-    } while(opcion!=5);
+    } while(opcion!=3);
 }
 int validarNum(char numChar[]){
     while (soloNumeros(numChar) != 1){ //verifico que no se hayan ingresado letras
@@ -590,20 +564,25 @@ struct Carton tieneColumna(struct Carton carton){
     carton.columna=0;
     return carton;
 }
-void Jugar(){
+void jugar(){
     int bolsa[MAX];
     struct Jugador jugador;
     struct Jugador cpu;
+
     int cantJugadas = 0;
+
+    //Inicializo los puntajes en 0
     jugador.puntos = 0;
     cpu.puntos = 0;
 
+    //Inicializo los flags en 0. Estos sirven para saber si ya se ha cantado linea/columna/bingo
     int flagLinea = 0;
     int flagColumna = 0;
     int flagBingo = 0;
 
-    system("cls");
-    printf("----A JUGAR----\n");
+    int opcion = 0;
+
+    printf("\n----A JUGAR----\n");
     //datos del jugador
     jugador.dniJugador = cargarDni();
     cargarNombreJugador(jugador.nombreJugador,jugador.apellidoJugador);
@@ -615,8 +594,6 @@ void Jugar(){
     cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
 
     rellenarCartonesAleatorio(cpu.cartones, cpu.cantCartones);
-    //GENERAR CPU DA PROBLEMAS, MEJOR SACARLO
-    //generarCpu(cpu); //Genera los cartones de la maquina.
     //carga la bolsa
     jugarBolillas(bolsa);
     for(int j=0; j<jugador.cantCartones; j++){
@@ -644,7 +621,6 @@ void Jugar(){
                 break; //Corta la itearcion
             }
 
-            int opcion = 0;
             printf("\n0 - CONTINUAR JUGADA\n" //Quiza modificar esto para que sea mejor, más comodo
                     "1 - Cantar Linea\n"
                     "2 - Cantar Columna\n"
