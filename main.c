@@ -155,7 +155,8 @@ int cantarBingo(struct Jugador j, int flag);
 float puntajeColumna(float p);
 float puntajeFila(float p);
 float puntajeBingo(float p);
-
+void guardarPuntosEnF(FILE *archivo,struct Jugador player);
+void obtenerPuntajes ();
 
 int main()
 {
@@ -195,6 +196,7 @@ void menu(){
             system("cls");
             break;
         case 2:
+            obtenerPuntajes();
             system("pause");
             system("cls");
             break;
@@ -568,6 +570,7 @@ void jugar(){
     int bolsa[MAX];
     struct Jugador jugador;
     struct Jugador cpu;
+    FILE *puntajes;
 
     int cantJugadas = 0;
 
@@ -659,6 +662,10 @@ void jugar(){
                         jugador.puntos = multiplicarPuntos(jugador.puntos, cantJugadas);
                         printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador.nombreJugador, jugador.apellidoJugador);
                         printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador.puntos);//Ponerlo en otro lugar
+                        puntajes = fopen("Puntajes.txt","a+");
+                        guardarPuntosEnF(puntajes,jugador);
+
+
                     } else {
                         i--;
                     }
@@ -795,4 +802,50 @@ float multiplicarPuntos(float puntaje, int cantBolillas){
         puntaje=puntaje*1.5;
     }
     return puntaje;
+}
+void guardarPuntosEnF(FILE *archivo,struct Jugador player)
+{
+    fprintf(archivo,"Nombre del jugador:%s+Puntaje obtenido:%.2f\n",player.nombreJugador,player.puntos);
+    fclose(archivo);
+}
+void obtenerPuntajes ()
+{
+    FILE *archivo;
+    struct Jugador player[100];
+    archivo = fopen("Puntajes.txt","r");
+    int i,posMas,contador = 0,flag;
+    char aux[15],floatAux[15];
+
+    while (!feof(archivo))
+    {
+    flag = 1;
+    fgets(aux,15,archivo);
+    for (i=0;i<15;i++)
+    {
+        if (aux[i]=='+')
+        {
+            posMas = i;
+            flag = 0;
+        }
+    }
+    if (flag == 1) //Si no hay caracter '+' significa que se llego a EOF y termina el loop
+    {
+        continue;
+    }
+    for (i=0;i<posMas;i++)
+    {
+        player[contador].nombreJugador[i] = aux[i];
+    }
+    for (i=posMas+1;i<15;i++)
+    {
+        floatAux[i-posMas-1] = aux[i];
+    }
+    player[contador].puntos = atof(floatAux);
+
+    printf(" Nombre:%s | Puntaje:%.2f\n",player[contador].nombreJugador,player[contador].puntos);
+
+    contador++;
+    }
+    fclose(archivo);
+
 }
