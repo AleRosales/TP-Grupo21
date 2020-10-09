@@ -29,7 +29,7 @@ struct Jugador
 };
 
 //PRE: Se debe inicializar una variable del tipo int para cargarla con el dato pedido
-//POST: Carga una variable verificando que sólo sea numérica.
+//POST: Carga una variable verificando que solo sea numerica.
 int cargarDni();
 
 //PRE: Requiere que las variables de char nom y ape existan previamente
@@ -44,41 +44,41 @@ void mostrarDatosJugador(int dni, char nom[], char ape[]);
 //POST:Se generan 3 filas y 5 columnas con numeros aleatorios sin repetir.
 void rellenarCartonAleatorio(int carton[][COLUMNA]);
 
-//PRE:Se tiene que recibir c/u de los números que rellenan el carton
+//PRE:Se tiene que recibir c/u de los numeros que rellenan el carton
 //POST:Retorna una variable true o false. Si es true, asigna un valor sin repetir a la matriz
-//Sino, vuelve a entrar en bucle hasta encontrar un número diferente al que le quiere asignar
+//Sino, vuelve a entrar en bucle hasta encontrar un numero diferente al que le quiere asignar
 bool numerosDelCartonSinRepetir(int carton[][COLUMNA],int num);
 
-//PRE: Cartón tiene que estar CARGADO
-//POST: Muestra por pantalla el cartón (o los cartones), saltos de
-//línea y varios
+//PRE: Carton tiene que estar CARGADO
+//POST: Muestra por pantalla el carton (o los cartones), saltos de
+//linea y varios
 void mostrarCarton(int carton[][COLUMNA]);
 
-//PRE:Se tiene que tipear un número entre 1 y 3.
-//POST:Se genera una cantidad de cartones acorde a lo que pidió el usuario.
+//PRE:Se tiene que tipear un numero entre 1 y 3.
+//POST:Se genera una cantidad de cartones acorde a lo que pidio el usuario.
 int cantidadDeCartones();
 
 //PRE: Toma el valor tipeado por el usuario y si no cumple las condiciones le hace repetir el proceso
-//POST: Devuelve el valor ingresado por el usuario que sí cumple las condiciones
+//POST: Devuelve el valor ingresado por el usuario que si cumple las condiciones
 int chequearCartones(char numChar[]);
 
-//PRE: Recibe un string y verifica que contenga sólo números.
-//POST: Devuelve 0 si la condición se cumple, 1 en caso contrario.
+//PRE: Recibe un string y verifica que contenga solo numeros.
+//POST: Devuelve 0 si la condicion se cumple, 1 en caso contrario.
 int soloNumeros(char strg[]);
 
-//PRE: Recibe un string y verifica que contenga sólo letras y/o espacios.
-//POST: Devuelve 0 si la condición se cumple, 1 en caso contrario.
+//PRE: Recibe un string y verifica que contenga solo letras y/o espacios.
+//POST: Devuelve 0 si la condicion se cumple, 1 en caso contrario.
 int soloLetras(char strg[]);
 
 //PRE: Recibe como parametro un valor del minimo y un valor del maximo para generar el numero aleatorio
 //POST: Devuelve un unico valor entero entre mini y maxi
 int aleatorioEntre(int mini, int maxi);
 
-//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligió, que ya debe estar seleccionada.
+//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligio, que ya debe estar seleccionada.
 //POST: Ejecuta una iteracion la misma cantidad de veces como cartones elegidos, llamando cada vez a rellenarCartonAleatorio().
 void rellenarCartonesAleatorio(struct Carton cartones[],int cantCartones);
 
-//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligió, que ya debe estar seleccionada.
+//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligio, que ya debe estar seleccionada.
 //POST: Ejecuta una iteracion la misma cantidad de veces como cartones elegidos, llamando cada vez a mostrarCarton().
 void mostrarCartones(struct Carton cartones[],int cantCartones);
 
@@ -90,11 +90,11 @@ struct Carton tieneFila(struct Carton carton);
 //POST: Genero los numeros del carton para la struct cpu
 void generarCpu(struct Jugador jugador);
 
-//PRE: bolsaNumeros tiene que estar definida, tiene que ser de tamaño == MAX.
+//PRE: bolsaNumeros tiene que estar definida, tiene que ser de tamanio == MAX.
 //POST: bolsaNumeros queda lleno por numeros unicos de 0 a < MAX, en orden aleatorio.
 void jugarBolillas(int bolsaNumeros[]);
 
-//PRE: bolsaNumeros[] ya esta definido y pasó el proceso de carga
+//PRE: bolsaNumeros[] ya esta definido y paso el proceso de carga
 //POST: muestra en pantalla las 90 bolillas de la bolsa
 void mostrarBolsa(int bolsaNumeros[],int hasta);
 
@@ -106,13 +106,13 @@ void checkAciertos(struct Jugador *jugador, int numCartones, int numeroBolsa);
 //POST: Devuelve 1 si son iguales, 0 si son distintos
 int compararNumeros(int num1, int num2);
 
-//PRE: Se lo llama al comienzo del main una única vez.
+//PRE: Se lo llama al comienzo del main una unica vez.
 //POST: Ejecuta un menu donde el usuario elije que hacer
 void menu();
 
 //PRE: char numChar debe estar inicializado y definido con el ingreso que hizo el usuario
 //POST: Verifica que se haya ingresado un numero, llamando a la funcion soloNumeros()
-//      Una vez verificado el numero, se retorna el valor entero del char que se ingresó
+//      Una vez verificado el numero, se retorna el valor entero del char que se ingreso
 int validarNum(char numChar[]);
 
 //PRE: Se lo llama dentro de la funcion rellenarCartonesManual
@@ -121,7 +121,7 @@ int validarNum(char numChar[]);
 //      LLama a otras funciones para verificar que se cumplan las condiciones correspondientes
 void rellenarCartonManual(int carton[][COLUMNA]);
 
-//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligió, que ya debe estar seleccionada.
+//PRE: Se pide un array del tipo struct Carton y la cantidad de cartones que el usuario eligio, que ya debe estar seleccionada.
 //POST: Ejecuta una iteracion la misma cantidad de veces como cartones elegidos, llamando cada vez a rellenarCartonManual().
 void rellenarCartonesManual(struct Carton cartones[],int cantCartones);
 
@@ -137,7 +137,7 @@ void subMenuCargarCartones(struct Carton cartones[],int cantCartones);
 int validarNumerosEntre (int num,int min, int max);
 
 //PRE: La matriz carton debe estar declarada
-//POST: Llena la matriz con 0, para así realizar la busqueda de numeros repetidos sin analizar basura.
+//POST: Llena la matriz con 0, para asi realizar la busqueda de numeros repetidos sin analizar basura.
 void inicializarVacio(int carton[][COLUMNA]);
 
 //PRE:
@@ -166,7 +166,7 @@ int main()
 }
 void menu(){
     /*COMENTARIO A BORRAR-->
-    Acá opcionChar[] lo ideal es que sea un char solo y no un array.
+    Aca opcionChar[] lo ideal es que sea un char solo y no un array.
     Hice una funcion que valide los numeros nueva, que reciba un char y no un string (como la que valida el DNI por ej.)
     El problema es cuando llega el atoi que lo convierte en int. atoi si o si recibe un string, y como le estariamos pasando
     un char, el programa se crashea. Solucion a medias: hacer un switch manualmente que retorne el valor entero del char. El
@@ -192,7 +192,6 @@ void menu(){
         case 1:
             system("cls");
             jugar();
-            system("pause");
             system("cls");
             break;
         case 2:
@@ -266,9 +265,9 @@ void rellenarCartonAleatorio(int carton[][COLUMNA]){
     for (int f=0; f<FILA; f++){
         for (int c=0; c<COLUMNA; c++){
             do{
-                numAl=aleatorioEntre(1,90); //SELECCIONA UN ÚNICO VALOR ENTRE 1 Y 90
+                numAl=aleatorioEntre(1,90); //SELECCIONA UN UNICO VALOR ENTRE 1 Y 90
             }
-            while (numerosDelCartonSinRepetir(carton,numAl)==false);  //SI EL NÚMERO SE REPITE, SE GENERARÁ OTRO NÚMERO ALEATORIO EN LA CASILLA SIGUIENTE
+            while (numerosDelCartonSinRepetir(carton,numAl)==false);  //SI EL NUMERO SE REPITE, SE GENERARA OTRO NUMERO ALEATORIO EN LA CASILLA SIGUIENTE
             carton[f][c]=numAl; //GUARDO EL NUMERO ALEATORIO EN LA MATRIZ
         }
     }
@@ -582,7 +581,9 @@ void jugar(){
     int flagLinea = 0;
     int flagColumna = 0;
     int flagBingo = 0;
+    int flagBingoCPU = 0;
 
+    int i = 0;
     int opcion = 0;
 
     printf("\n----A JUGAR----\n");
@@ -600,7 +601,7 @@ void jugar(){
     //carga la bolsa
     jugarBolillas(bolsa);
     for(int j=0; j<jugador.cantCartones; j++){
-        for(int i=0; i<MAX; i++){
+       while(flagBingo!=1&&flagBingoCPU!=1){ //Repite mientras que cpu y usuario NO hagan bingo. Al primero que hace, corta la iteracion.
             system("cls");
             printf("Jugada nro:%d\n",i+1);
             mostrarBolsa(bolsa,i+1);
@@ -620,11 +621,13 @@ void jugar(){
                 printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <CPU>\n");
                 cantJugadas = i+1;
                 cpu.puntos = multiplicarPuntos(cpu.puntos, cantJugadas);
+                flagBingoCPU = 1;
                 printf(">PUNTAJE FINAL CPU: %.2f\n", cpu.puntos);
+                system("pause");
                 break; //Corta la itearcion
             }
 
-            printf("\n0 - CONTINUAR JUGADA\n" //Quiza modificar esto para que sea mejor, más comodo
+            printf("\n0 - CONTINUAR JUGADA\n" //Quiza modificar esto para que sea mejor, mas comodo
                     "1 - Cantar Linea\n"
                     "2 - Cantar Columna\n"
                     "3 - Cantar Bingo\n"
@@ -661,7 +664,7 @@ void jugar(){
                         cantJugadas = i+1;
                         jugador.puntos = multiplicarPuntos(jugador.puntos, cantJugadas);
                         printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador.nombreJugador, jugador.apellidoJugador);
-                        printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador.puntos);//Ponerlo en otro lugar
+                        printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador.puntos);//Ponerlo en otro lugar??
                         puntajes = fopen("Puntajes.txt","a+");
                         guardarPuntosEnF(puntajes,jugador);
 
@@ -678,6 +681,7 @@ void jugar(){
                     system("pause");
                     break;
                 }
+                i++;
         }
     }
 }
