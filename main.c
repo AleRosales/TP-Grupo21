@@ -36,10 +36,6 @@ int cargarDni();
 //POST: Sobreescribe el valor de dichas variables con los datos ingresados verificando que solo sean letras y/o espacios.
 void cargarNombreJugador(char nom[], char ape[]);
 
-//PRE: los datos del jugador ya pasaron por el proceso de carga
-//POST: Muestra los datos
-void mostrarDatosJugador(int dni, char nom[], char ape[]);
-
 //PRE:Carton tiene que estar definido.
 //POST:Se generan 3 filas y 5 columnas con numeros aleatorios sin repetir.
 void rellenarCartonAleatorio(int carton[][COLUMNA]);
@@ -140,7 +136,7 @@ int validarNumerosEntre (int num,int min, int max);
 //POST: Llena la matriz con 0, para así realizar la busqueda de numeros repetidos sin analizar basura.
 void inicializarVacio(int carton[][COLUMNA]);
 
-//PRE:
+//PRE:El usuario selecciona jugar
 //POST: Puntos y ganador de la partida
 void jugar();
 
@@ -155,8 +151,47 @@ int cantarBingo(struct Jugador j, int flag);
 float puntajeColumna(float p);
 float puntajeFila(float p);
 float puntajeBingo(float p);
-void guardarPuntosEnF(FILE *archivo,struct Jugador player);
-void obtenerPuntajes ();
+
+//PRE: se le pasa un dato de tipo struct Jugador el cual se guardará en un arhchivo
+//POST: Si no existe, crea un archivo con los datos del jugador. Y si existe, agrega dichos datos al final
+void guardarPuntosEnF(struct Jugador player);
+
+//PRE: se le pasa un array Jugador y su repectivo tamaño
+//     Abre en modo lectura un archivo (si existe) y le obtiene los datos del mismo
+//     LLama a funciones para pasar los datos del texto a variables
+//POST: devuelve 1 si se pudo leer, 0 si no.
+int leerPuntajesDeArchivo(struct Jugador j[], int t);
+
+//PRE: o = Origen de la busqueda, desde donde empieza
+//     v[] = es el string en donde se tiene que realizar la busqueda
+//     c = es el caracter que tiene que encontrarse
+//     t = es el tamaño del string
+//POST: devuelve la posicion en donde se econtró coincidencia
+int busquedaSecuencial (int o,char v[], char c, int t);
+
+//PRE: Se le pasa un string y su tamanio
+//     Realiza busquedas secuenciales sobre el string 'c'
+//POST: Devuelve un dato de tipo struct Jugador con los datos obtenidos de un archivo de texto
+struct Jugador charAJugador(char c[], int t);
+
+//PRE: Se le pasa un array de Jugador y su respectivo tamanio
+//POST: Muestra por pantalla los puntajes y los datos de los jugadores
+void mostrarPuntaje(struct Jugador j[], int t);
+
+//PRE: Se le pasa un array Jugador
+//     t = la cantidad máxima que almacena los puntajes
+//     c = la cantidad de puntajes a mostrar
+//POST: Imprime el array ordenado
+void rankingPuntajes(struct Jugador j[], int t, int c);
+
+//PRE: Se le pasa un array de Jugador y el tamanio del mismo
+//POST: Ordena de mayor a menor la estructura
+void ordenarBurbuja(struct Jugador p[], int t);
+
+//PRE: se le pasa un array Jugador y su tamanio
+//POST: Inicializa todos los puntajes en -1
+void initPuntajes(struct Jugador j[], int t);
+
 
 int main()
 {
@@ -175,14 +210,20 @@ void menu(){
     <----COMENTARIO A BORRAR*/
     char opcionChar[1]; //para la opcion en char.
     int opcion; //para la opcion en int
+    int flagArchivo=0; //Si no hay archivo, se queda en 0
+    int  tamMaxPuntaje=100;
+    struct Jugador j[tamMaxPuntaje]; //100 seria el maximo de puntajes que almacena, se podria mejorar con una lista dinamica supongo
+    initPuntajes(j, tamMaxPuntaje);
+    flagArchivo = leerPuntajesDeArchivo(j,tamMaxPuntaje);
 
     do{
         printf("BIENVENIDO AL BINGO!\n"
                "-------------------------------\n"
                "> Por favor, ingrese una opci%cn:\n"
                 "\t1 - Jugar\n"
-                "\t2 - Ver historial de puntajes (no esta listo todavia)\n" //Para cuando tengamos el archivo, si no hay puntajes muestra un mensaje que dice que todavia no se ha jugado
-                "\t3 - Salir\n\n"
+                "\t2 - Ver historial de puntajes\n"
+                "\t3 - Ver Ranking Top 3 de puntajes\n"
+                "\t4 - Salir\n\n"
                 "Su opci%cn: ", 162, 162);
         fflush(stdin);
         gets(opcionChar);
@@ -195,11 +236,24 @@ void menu(){
             system("cls");
             break;
         case 2:
-            obtenerPuntajes();
+            if(flagArchivo==0){
+                printf("\nNo hay puntajes. Todavia no se ha jugado nignuna partida.\n\n");
+            } else{
+                mostrarPuntaje(j, tamMaxPuntaje);
+            }
             system("pause");
             system("cls");
             break;
         case 3:
+            if(flagArchivo==0){
+                printf("\nNo hay puntajes. Todavia no se ha jugado nignuna partida.\n\n");
+            } else{
+            rankingPuntajes(j, tamMaxPuntaje, 3); //3 porque es la cantidad que muestro
+            }
+            system("pause");
+            system("cls");
+            break;
+        case 4:
             printf("\n>> Usted ha salido.\n");
             break;
         default:
@@ -208,8 +262,9 @@ void menu(){
             system("cls");
             break;
         }
-    } while(opcion!=3);
+    } while(opcion!=4);
 }
+
 int validarNum(char numChar[]){
     while (soloNumeros(numChar) != 1){ //verifico que no se hayan ingresado letras
         printf("\n>> ERROR! S%clo se admiten n%cmeros, vuelva a intentarlo:\n\nSu opci%cn: ", 162, 163, 162);
@@ -250,14 +305,6 @@ void cargarNombreJugador(char nom[], char ape[]){
         printf("\n>> ERROR! S%clo se admiten letras, vuelva a intentarlo.\n\n", 162);
         gets(ape);
     }
-}
-
-void mostrarDatosJugador(int dni, char nom[], char ape[]){
-    printf("-----------------\n"
-           ">>> DNI: %d\n"
-           ">>> NOMBRE: %s\n"
-           ">>> APELLIDO: %s\n"
-           "-----------------\n", dni, nom, ape);
 }
 
 void rellenarCartonAleatorio(int carton[][COLUMNA]){
@@ -569,7 +616,6 @@ void jugar(){
     int bolsa[MAX];
     struct Jugador jugador;
     struct Jugador cpu;
-    FILE *puntajes;
 
     int cantJugadas = 0;
 
@@ -597,6 +643,9 @@ void jugar(){
 
     cpu.cantCartones = jugador.cantCartones; //Iguala los cartones de la maquina a los del jugador.
 
+    strcpy(cpu.nombreJugador, "CPU"); //Se guarda asi tamben en el archivo
+    cpu.dniJugador=-2; //Para no mostrar el DNI de la CPU cuando se mustran los puntajes. -2 porque el '-1' es para los puntajes vacios
+    strcpy(cpu.apellidoJugador, "NULL");
     rellenarCartonesAleatorio(cpu.cartones, cpu.cantCartones);
     //carga la bolsa
     jugarBolillas(bolsa);
@@ -623,6 +672,7 @@ void jugar(){
                 cpu.puntos = multiplicarPuntos(cpu.puntos, cantJugadas);
                 flagBingoCPU = 1;
                 printf(">PUNTAJE FINAL CPU: %.2f\n", cpu.puntos);
+                guardarPuntosEnF(cpu);
                 system("pause");
                 break; //Corta la itearcion
             }
@@ -665,8 +715,7 @@ void jugar(){
                         jugador.puntos = multiplicarPuntos(jugador.puntos, cantJugadas);
                         printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador.nombreJugador, jugador.apellidoJugador);
                         printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador.puntos);//Ponerlo en otro lugar??
-                        puntajes = fopen("Puntajes.txt","a+");
-                        guardarPuntosEnF(puntajes,jugador);
+                        guardarPuntosEnF(jugador);
 
 
                     } else {
@@ -807,49 +856,115 @@ float multiplicarPuntos(float puntaje, int cantBolillas){
     }
     return puntaje;
 }
-void guardarPuntosEnF(FILE *archivo,struct Jugador player)
-{
-    fprintf(archivo,"Nombre del jugador:%s+Puntaje obtenido:%.2f\n",player.nombreJugador,player.puntos);
-    fclose(archivo);
-}
-void obtenerPuntajes ()
+void guardarPuntosEnF(struct Jugador player)
 {
     FILE *archivo;
-    struct Jugador player[100];
+    archivo = fopen("Puntajes.txt", "a");
+    /*Antes estaba así: fprintf(archivo,"Nombre del jugador:%s+Puntaje obtenido:%.2f\n",player.nombreJugador,player.puntos);
+    Pero en el archivo solo se guardan los datos, el programador es quien sabe qué dato es qué cosa, segun el orden en el que se ingresan
+    El usuario no tiene acceso al archivo, ve los puntajes mediante un printf en pantalla*/
+    fprintf(archivo,"%d+%s+%s+%.2f\n",player.dniJugador,player.nombreJugador,player.apellidoJugador,player.puntos);
+    fclose(archivo);
+}
+int leerPuntajesDeArchivo(struct Jugador j[], int t)
+{
+    FILE *archivo;
     archivo = fopen("Puntajes.txt","r");
-    int i,posMas,contador = 0,flag;
-    char aux[15],floatAux[15];
-
-    while (!feof(archivo))
-    {
-    flag = 1;
-    fgets(aux,15,archivo);
-    for (i=0;i<15;i++)
-    {
-        if (aux[i]=='+')
-        {
-            posMas = i;
-            flag = 0;
-        }
+    int i=0;
+    char aux[40] = " ";
+    if(archivo==NULL){
+        return 0;
     }
-    if (flag == 1) //Si no hay caracter '+' significa que se llego a EOF y termina el loop
+    //Mientras que el archivo exista y no llegue al final...
+    while ((archivo!=NULL)&&(!feof(archivo)))
     {
-        continue;
-    }
-    for (i=0;i<posMas;i++)
-    {
-        player[contador].nombreJugador[i] = aux[i];
-    }
-    for (i=posMas+1;i<15;i++)
-    {
-        floatAux[i-posMas-1] = aux[i];
-    }
-    player[contador].puntos = atof(floatAux);
-
-    printf(" Nombre:%s | Puntaje:%.2f\n",player[contador].nombreJugador,player[contador].puntos);
-
-    contador++;
+        strcpy(aux, "-1+-1+-1+-1"); //esto le da el valor de '-1' a todas las variables, por lo que luego se considerará vacía la pos
+                        //esto es porque siempre al leer un nuevo dato, se lee un salto de linea que hace que el while se itere una vez más al final
+                        //al iterarse esa vez, genera un puntaje basura (repetido del puntaje anterior)
+        fgets(aux,40,archivo);
+        j[i]=charAJugador(aux, 40);
+        i++;
     }
     fclose(archivo);
+    return 1;
+}
+
+void mostrarPuntaje(struct Jugador j[], int t){
+    for(int i=0; i<t; i++){
+        if(j[i].puntos!=-1){ //Mientras los puntos no sean -1
+            if(j[i].dniJugador==-2){
+            printf("\tNOMBRE: [%s] - PUNTAJE: [%.2f]\n",j[i].nombreJugador,j[i].puntos); //Obviamente no mostramos el DNI ni Apellido de la CPU
+            }else {
+            printf("\tDNI: [%d] - NOMBRE: [%s] - APELLIDO: [%s] - PUNTAJE: [%.2f]\n",j[i].dniJugador, j[i].nombreJugador,j[i].apellidoJugador,j[i].puntos);
+            }
+        }
+    }
+}
+struct Jugador charAJugador(char c[], int t){
+    struct Jugador j;
+    int i,posMas1, posMas2, posMas3;
+    char auxNombre[15]= " ", auxApellido[15]=" ",auxPuntaje[15]= " ", auxDNI[15]= " ";
+
+    posMas1 = busquedaSecuencial(0,c, '+', t); //busqueda del '+' que empieza en 0
+    posMas2 = busquedaSecuencial(posMas1+1,c,'+',t); //busqueda del '+' que empieza en posMas1+1
+    posMas3 = busquedaSecuencial(posMas2+1,c,'+',t); //busqueda del '+' que empieza en posMas2+1
+
+    for (i=0;i<posMas1;i++)
+    {
+       auxDNI[i] = c[i];
+    }
+    for (i=posMas1+1;i<posMas2;i++)
+    {
+        auxNombre[i-posMas1-1] = c[i];
+    }
+    for(i=posMas2+1;i<posMas3;i++){
+        auxApellido[i-posMas2-1] = c[i];
+    }
+    for(i=posMas3+1; i<t;i++){
+        if(c[i]=='\0'){ //si llega al final, corto la iteracion
+            break;
+        } else{
+            auxPuntaje[i-posMas3-1] = c[i];
+        }
+    }
+    j.dniJugador = atoi(auxDNI);
+    strcpy(j.nombreJugador, auxNombre);
+    strcpy(j.apellidoJugador, auxApellido);
+    j.puntos = atof(auxPuntaje);
+    return j;
+};
+int busquedaSecuencial (int o,char v[], char c, int t){
+    for(int i=o; i<t; i++){
+        if(v[i]==c){
+            return i;
+        }
+    }
+    return -1;
+}
+void rankingPuntajes(struct Jugador j[], int t, int c){
+    struct Jugador jOrdenado[t];
+    for(int i=0; i<t; i++){ //Duplico el array para mantener el origina en la ejecucion del programa
+        jOrdenado[i] = j[i];
+    }
+    ordenarBurbuja(jOrdenado,t); //ordeno el array
+    mostrarPuntaje(jOrdenado,c); //Muestro solo 5, los 5 mayores
+}
+void ordenarBurbuja(struct Jugador p[], int t){
+    struct Jugador aux;
+    for (int j=0; j<t; j++) {
+        for(int i =0 ; i<t-1; i++) {
+            if(p[i].puntos<p[i+1].puntos) {
+                aux = p[i];
+                p[i]= p[i+1];
+                p[i+1]= aux;
+            }
+        }
+    }
+}
+void initPuntajes(struct Jugador j[], int t){
+    for(int k=0;k<t;k++){
+        j[k].puntos=-1;
+    }
 
 }
+

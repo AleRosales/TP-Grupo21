@@ -1,7 +1,5 @@
-a+10
-be+20
-cee+30
-deee+40
-eeeee+50
-feeeee+60
-geeeeee+70
+-2+CPU+NULL+545.00
+35262152+JUAN+CARLOS+14.20
+42015351+Sofia+Lopez+200.00
+-2+CPU+NULL+140.2
+-2+CPU+NULL+100.00
