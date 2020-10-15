@@ -5,3 +5,84 @@
 	<time.h>
 	<stdbool.h>
 
+1602202579 source:c:\users\aaron\desktop\programación de computadoras\tp-grupo21-master\jugador.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"jugador.h"
+
+1602203019 c:\users\aaron\desktop\programación de computadoras\tp-grupo21-master\jugador.h
+
+1602215718 source:f:\tarea 2020\programacion de computadoras\tp-grupo21-mastertda\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"jugador.h"
+
+1602720812 f:\tarea 2020\programacion de computadoras\tp-grupo21-mastertda\jugador.h
+
+1602721598 source:f:\tarea 2020\programacion de computadoras\tp-grupo21-mastertda\jugador.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"jugador.h"
+	"carton.h"
+
+1602720656 source:f:\tarea 2020\programacion de computadoras\tp-grupo21-mastertda\carton.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"carton.h"
+
+1602720656 f:\tarea 2020\programacion de computadoras\tp-grupo21-mastertda\carton.h
+
+1602774488 source:c:\users\dante\desktop\tp-grupo21-mastertda\tp-grupo21-mastertda\carton.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"jugador.h"
+	"carton.h"
+	"funciones.h"
+
+1602773728 c:\users\dante\desktop\tp-grupo21-mastertda\tp-grupo21-mastertda\carton.h
+
+1602774450 source:c:\users\dante\desktop\tp-grupo21-mastertda\tp-grupo21-mastertda\jugador.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"jugador.h"
+	"carton.h"
+	"funciones.h"
+
+1602773979 c:\users\dante\desktop\tp-grupo21-mastertda\tp-grupo21-mastertda\jugador.h
+
+1602774041 source:c:\users\dante\desktop\tp-grupo21-mastertda\tp-grupo21-mastertda\main.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"jugador.h"
+
+1602773979 c:\users\dante\desktop\tp-grupo21-mastertda\tp-grupo21-mastertda\funciones.h
+
+1602774129 source:c:\users\dante\desktop\tp-grupo21-mastertda\tp-grupo21-mastertda\funciones.c
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	<stdbool.h>
+	<windows.h>
+	"funciones.h"
+
