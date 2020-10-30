@@ -15,10 +15,6 @@
 struct Cartones
 {
     int carton[FILA][COLUMNA];
-    int fila;
-    int columna;
-    int bingo;
-
 };
 float puntajeParcialAutomaticoCPU(Carton cartones[],int cantCartones,int *flagColum,int *flagFil,int *flagBingo){
     float puntaje=0;
@@ -67,44 +63,6 @@ void mostrarCartones(Carton cartones[],int cantCartones){
         printf("\n-------> Cart%cn %d <-------\n",162,i+1);
         mostrarCarton(cartones[i]->carton);
     }
-}
-Carton tieneFila(Carton carton){
-    for (int f=0; f<FILA; f++){
-        //Recorre toda la fila y chequea si salio toda
-        int fila=0;
-        for (int c=0; c<COLUMNA; c++){
-            //si el numero ya salio de la bolsa
-            if(carton->carton[f][c]<1){
-                fila=fila+1;
-            }
-        }
-        //todos los numeros ya salieron de la bolsa
-        if(fila==FILA){
-            carton->fila=1;
-            return carton;
-        }
-    }
-    carton->fila=0;
-    return carton;
-}
-Carton tieneColumna(Carton carton){
-    for (int c=0; c<COLUMNA; c++){
-        //Recorre toda la columna y chequea si salio toda
-        int col=0;
-        for (int f=0; f<FILA; f++){
-            //si el numero ya salio de la bolsa
-            if(carton->carton[f][c]<1){
-                col=col+1;
-            }
-        }
-        //si todos los numeros ya salieron de la bolsa
-        if(col==COLUMNA){
-            carton->columna=1;
-            return carton;
-        }
-    }
-    carton->columna=0;
-    return carton;
 }
 //Si alguno tiene una mejor forma o mas prolija para esto, bienvenido sea.
 void checkAciertos(Carton cartones[], int cantCartones, int numeroBolsa){

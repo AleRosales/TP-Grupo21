@@ -8,10 +8,6 @@ typedef struct Cartones *Carton;
 //POST: Ejecuta una iteracion la misma cantidad de veces como cartones elegidos, llamando cada vez a mostrarCarton().
 void mostrarCartones(Carton cartones[],int cantCartones);
 
-Carton tieneColumna(Carton carton);
-
-Carton tieneFila(Carton carton);
-
 //PRE: Se lo llama dentro de la funcion rellenarCartonesManual
 //     Se le pasa como parametro una matriz dentro de la struct Carton
 //POST: Pide al usuario el ingreso de los numeros seleccionados para el carton
