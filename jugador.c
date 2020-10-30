@@ -87,9 +87,6 @@ void menu(){
     for(int i=0; i<tamMaxPuntaje;i++){
           j[i]=newJugador(); //reservo memoria para los puntajes
     }
-    initPuntajes(j, tamMaxPuntaje);
-    flagArchivo = leerPuntajesDeArchivo(j,tamMaxPuntaje);
-
     do{
         printf("BIENVENIDO AL BINGO!\n"
                "-------------------------------\n"
@@ -110,6 +107,8 @@ void menu(){
             system("cls");
             break;
         case 2:
+            initPuntajes(j, tamMaxPuntaje);
+            flagArchivo = leerPuntajesDeArchivo(j,tamMaxPuntaje);
             if(flagArchivo==0){
                 printf("\nNo hay puntajes. Todav%ca no se ha jugado ninguna partida.\n\n",161);
             } else{
@@ -119,10 +118,12 @@ void menu(){
             system("cls");
             break;
         case 3:
+            initPuntajes(j, tamMaxPuntaje);
+            flagArchivo = leerPuntajesDeArchivo(j,tamMaxPuntaje);
            if(flagArchivo==0){
                 printf("\nNo hay puntajes. Todav%ca no se ha jugado ninguna partida.\n\n",161);
             } else{
-            rankingPuntajes(j, tamMaxPuntaje, 3); //3 porque es la cantidad de puntajes que muestro
+                rankingPuntajes(j, tamMaxPuntaje, 3); //3 porque es la cantidad de puntajes que muestro
             }
             system("pause");
             system("cls");
@@ -278,7 +279,7 @@ void jugar(){
 
         printf("\n<<<< Cartones CPU >>>>\n");
         mostrarCartones(cpu->cartones, cpu->cantCartones);
-        cpu->puntos=puntajeParcialAutomaticoCPU(cpu->cartones, cpu->cantCartones,&flagColumna,&flagLinea,&flagBingo);
+        cpu->puntos+=puntajeParcialAutomaticoCPU(cpu->cartones, cpu->cantCartones,&flagColumna,&flagLinea,&flagBingo);
 
         //Para la CPU, los puntajes son automaticos
         //Para el usuario, se debe cantar linea/columna/bingo manualmente.
@@ -289,6 +290,7 @@ void jugar(){
             printf(">PUNTAJE FINAL CPU: %.2f\n", cpu->puntos);
             guardarPuntosEnF(cpu);
             flagBingo = 1;
+            system("pause");
             break; //Corta la itearcion
         }
 
@@ -322,7 +324,6 @@ void jugar(){
                 system("pause");
                 break;
             case 3:
-                system("cls");
                 flagBingo=cantarBingo(jugador->cartones, flagBingo,jugador->cantCartones);
                 if(flagBingo==1){
                     jugador->puntos=puntajeBingo(jugador->puntos);
@@ -366,9 +367,9 @@ float puntajeBingo(float p){
 
 
 float multiplicarPuntos(float puntaje, int cantBolillas){
-    if(cantBolillas<30){
+    if(cantBolillas<=30){
         puntaje=puntaje*2;
-    } else if(cantBolillas>=30&&cantBolillas<50){
+    } else if(cantBolillas>30&&cantBolillas<50){
         puntaje=puntaje*1.7;
     } else if(cantBolillas>=50&&cantBolillas<=70){
         puntaje=puntaje*1.5;

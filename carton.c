@@ -19,16 +19,16 @@ struct Cartones
 float puntajeParcialAutomaticoCPU(Carton cartones[],int cantCartones,int *flagColum,int *flagFil,int *flagBingo){
     float puntaje=0;
     for(int i=0; i<cantCartones; i++){
-        if((checkColumna(cartones[i]->carton)==1)&&(flagColum==0)){
+        if((checkColumna(cartones[i]->carton)==1)&&((*flagColum)==0)){
             (*flagColum)=1;
             puntaje+=10;
         }
-        if((checkFila(cartones[i]->carton)==1)&&(flagFil==0)){
+        if((checkFila(cartones[i]->carton)==1)&&((*flagFil)==0)){
             (*flagFil)=1;
             puntaje+=20;
         }
     }
-    if((checkBingo(cartones,cantCartones)==1) && (flagBingo==0)){
+    if((checkBingo(cartones,cantCartones)==1) && ((*flagBingo)==0)){
         (*flagBingo)=1;
         puntaje+=70;
     }
