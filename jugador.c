@@ -224,7 +224,7 @@ void rellenarCartonesManual(Jugador j,int cantCartones){
 void jugar(){
     int bolsa[MAX];
 
-    //--------------CONSTRUYO EL DADO EN MEMORIA------//
+    //--------------CONSTRUYO EL DATO EN MEMORIA------//
     Jugador jugador=newJugador();
     Jugador cpu=newJugador();
 
@@ -249,7 +249,6 @@ void jugar(){
     jugador->cantCartones = cantidadDeCartones();
     //cartones
     subMenuCargarCartones(jugador);
-    //mostrarCartones(jugador->cartones,jugador->cantCartones);
 
     cpu->cantCartones = jugador->cantCartones; //Iguala los cartones de la maquina a los del jugador.
     strcpy(cpu->nombreJugador, "CPU"); //Se guarda asi tamben en el archivo
