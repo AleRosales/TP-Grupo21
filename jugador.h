@@ -51,10 +51,21 @@ void rellenarCartonesManual(Jugador j,int cantCartones);
 //POST: Puntos y ganador de la partida
 void jugar();
 
+//PRE: puntaje es el puntaje total que se le pasa, por el cual se hará la multiplicacion
+//     cantBolillas es la cantidad de bolillas que tuvieron que salir para llegar a ese puntaje
+//POST: devuelve el valor del puntaje con el agreago de la multipliacion según la cantidad de bolillas que salieron
 float multiplicarPuntos(float puntaje, int cantBolillas);
 
+//PRE: float p correponde al puntaje del jugador
+//POST: se le suma 10 puntos al puntaje
 float puntajeColumna(float p);
+
+//PRE: float p correponde al puntaje del jugador
+//POST: se le suma 20 puntos al puntaje
 float puntajeFila(float p);
+
+//PRE: float p correponde al puntaje del jugador
+//POST: se le suma 70 puntos al puntaje
 float puntajeBingo(float p);
 
 //PRE: se le pasa un dato de tipo struct Jugador el cual se guardará en un arhchivo

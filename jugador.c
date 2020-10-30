@@ -69,14 +69,6 @@ int cantidadDeCartones(){
 }
 
 void menu(){
-    /*COMENTARIO A BORRAR-->
-    Acá opcionChar[] lo ideal es que sea un char solo y no un array.
-    Hice una funcion que valide los numeros nueva, que reciba un char y no un string (como la que valida el DNI por ej.)
-    El problema es cuando llega el atoi que lo convierte en int. atoi si o si recibe un string, y como le estariamos pasando
-    un char, el programa se crashea. Solucion a medias: hacer un switch manualmente que retorne el valor entero del char. El
-    tema de eso es que que si se excede el numero y se tipea "215643", va a ingresar a la opcion 2 porque solo toma el primer numero.
-    Conclusion: lo dejamos asi y fue :)
-    <----COMENTARIO A BORRAR*/
     char opcionChar[1]; //para la opcion en char.
     int opcion; //para la opcion en int
 
@@ -294,7 +286,7 @@ void jugar(){
             break; //Corta la itearcion
         }
 
-        printf("\n0 - CONTINUAR JUGADA\n" //Quiza modificar esto para que sea mejor, más comodo
+        printf("\n0 - CONTINUAR JUGADA\n"
                 "1 - Cantar Linea\n"
                 "2 - Cantar Columna\n"
                 "3 - Cantar Bingo\n"
@@ -379,9 +371,6 @@ float multiplicarPuntos(float puntaje, int cantBolillas){
 void guardarPuntosEnF(Jugador player){
     FILE *archivo;
     archivo = fopen("Puntajes.txt", "a");
-    /*Antes estaba así: fprintf(archivo,"Nombre del jugador:%s+Puntaje obtenido:%.2f\n",player.nombreJugador,player.puntos);
-    Pero en el archivo solo se guardan los datos, el programador es quien sabe qué dato es qué cosa, segun el orden en el que se ingresan
-    El usuario no tiene acceso al archivo, ve los puntajes mediante un printf en pantalla*/
     fprintf(archivo,"%d+%s+%s+%.2f\n",player->dniJugador,player->nombreJugador,player->apellidoJugador,player->puntos);
     fclose(archivo);
 }
@@ -479,10 +468,10 @@ void initPuntajes(Jugador j[], int t){
 
 }
 Jugador newJugador(){
-        Jugador j = malloc(sizeof(struct Jugadores));
+        Jugador j = malloc(sizeof(struct Jugadores)); //reservo memoria para cada jugador
         return j;
 }
 void destruirJugador(Jugador p){
-    free(p);
+    free(p); //libero la memoria de los jugadores
 }
 

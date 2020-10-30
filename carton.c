@@ -64,13 +64,12 @@ void mostrarCartones(Carton cartones[],int cantCartones){
         mostrarCarton(cartones[i]->carton);
     }
 }
-//Si alguno tiene una mejor forma o mas prolija para esto, bienvenido sea.
 void checkAciertos(Carton cartones[], int cantCartones, int numeroBolsa){
     for(int cart = 0; cart < cantCartones; cart++){
         for(int fil = 0; fil < FILA; fil++){
             for(int col = 0; col < COLUMNA; col++){
                 if (compararNumeros(cartones[cart]->carton[fil][col],numeroBolsa) == 1){
-                    cartones[cart]->carton[fil][col] = -1;
+                    cartones[cart]->carton[fil][col] = -1; //asigno a -1 el valor que salió en la bolsa
                 }
             }
         }
@@ -179,9 +178,9 @@ Carton rellenarCartonAleatorio(){
     for (int f=0; f<FILA; f++){
         for (int c=0; c<COLUMNA; c++){
             do{
-                numAl=aleatorioEntre(1,90); //SELECCIONA UN ÃšNICO VALOR ENTRE 1 Y 90
+                numAl=aleatorioEntre(1,90); //SELECCIONA UN ÚNICO VALOR ENTRE 1 Y 90
             }
-            while (numerosDelCartonSinRepetir(cart->carton,numAl)==false);  //SI EL NÃšMERO SE REPITE, SE GENERARÃ OTRO NÃšMERO ALEATORIO EN LA CASILLA SIGUIENTE
+            while (numerosDelCartonSinRepetir(cart->carton,numAl)==false);  //SI EL NÚMERO SE REPITE, SE GENERARÁ OTRO NÚMERO ALEATORIO EN LA CASILLA SIGUIENTE
             cart->carton[f][c]=numAl; //GUARDO EL NUMERO ALEATORIO EN LA MATRIZ
         }
     }
@@ -218,7 +217,7 @@ void mostrarCarton(int carton[][COLUMNA]){
             }else if(carton[f][c]>=10) { //Si es mayor/igual a 10, se muestra sin ningun agregado
                 printf(" %d %c",carton[f][c],179);
             } else{
-                //El nuemro ya salio entonces es xx
+                //El numero ya salio entonces es xx
                 printf(" XX %c", 179);
             }
 

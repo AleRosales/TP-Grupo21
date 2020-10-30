@@ -62,7 +62,7 @@ int compararNumeros(int num1, int num2)
 
 int soloNumeros(char strg[]){
     int i=0;
-    while (strg[i] != '\0'){
+    while (strg[i] != '\0'){ //hasta /0 porque es hasta el final del string
         if (strg[i] < '0' || strg[i] > '9'){
             return 0;
         }
