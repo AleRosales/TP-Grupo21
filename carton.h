@@ -18,7 +18,7 @@ Carton tieneFila(Carton carton);
 //      LLama a otras funciones para verificar que se cumplan las condiciones correspondientes
 Carton rellenarCartonManual();
 
-float puntajeParcialAutomaticoCPU(Carton[],int cantCartones);
+float puntajeParcialAutomaticoCPU(Carton cartones[],int cantCartones,int *flagColum,int *flagFil,int *flagBingo);
 
 //POST:Reserva espacio memoria para Carton
 Carton newCarton();

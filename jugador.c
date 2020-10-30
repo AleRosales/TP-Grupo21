@@ -245,7 +245,6 @@ void jugar(){
     int flagLinea = 0;
     int flagColumna = 0;
     int flagBingo = 0;
-    int flagBingoCPU = 0;
     int i = 0;
 
     int opcion = 0;
@@ -267,87 +266,84 @@ void jugar(){
     rellenarCartonesAleatorio(cpu, cpu->cantCartones);
     //carga la bolsa
     jugarBolillas(bolsa);
-    for(int j=0; j<jugador->cantCartones; j++){
-       while(flagBingo!=1&&flagBingoCPU!=1){ //Repite mientras que cpu y usuario NO hagan bingo. Al primero que hace, corta la iteracion.
-            system("cls");
-            printf("Jugada nro:%d\n",i+1);
-            mostrarBolsa(bolsa,i+1);
-            checkAciertos(jugador->cartones, jugador->cantCartones, bolsa[i]);
-            checkAciertos(cpu->cartones, cpu->cantCartones, bolsa[i]);
+    while(flagBingo!=1 && i<90){ //Repite mientras que cpu y usuario NO hagan bingo. Al primero que hace, corta la iteracion.
+        system("cls");
+        printf("Jugada nro:%d\n",i+1);
+        mostrarBolsa(bolsa,i+1);
+        checkAciertos(jugador->cartones, jugador->cantCartones, bolsa[i]);
+        checkAciertos(cpu->cartones, cpu->cantCartones, bolsa[i]);
 
-            printf("\n<<<< Cartones Jugador >>>>\n");
-            mostrarCartones(jugador->cartones,jugador->cantCartones);
+        printf("\n<<<< Cartones Jugador >>>>\n");
+        mostrarCartones(jugador->cartones,jugador->cantCartones);
 
-            printf("\n<<<< Cartones CPU >>>>\n");
-            mostrarCartones(cpu->cartones, cpu->cantCartones);
-            cpu->puntos=puntajeParcialAutomaticoCPU(cpu->cartones, cpu->cantCartones);
+        printf("\n<<<< Cartones CPU >>>>\n");
+        mostrarCartones(cpu->cartones, cpu->cantCartones);
+        cpu->puntos=puntajeParcialAutomaticoCPU(cpu->cartones, cpu->cantCartones,&flagColumna,&flagLinea,&flagBingo);
 
-            //Para la CPU, los puntajes son automaticos
-            //Para el usuario, se debe cantar linea/columna/bingo manualmente.
-            if(checkBingo(cpu->cartones,cpu->cantCartones)==1){
-                printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <CPU>\n");
-                cantJugadas = i+1;
-                cpu->puntos = multiplicarPuntos(cpu->puntos, cantJugadas);
-                printf(">PUNTAJE FINAL CPU: %.2f\n", cpu->puntos);
-                guardarPuntosEnF(cpu);
-                flagBingoCPU = 1;
-                break; //Corta la itearcion
-            }
-
-            printf("\n0 - CONTINUAR JUGADA\n" //Quiza modificar esto para que sea mejor, más comodo
-                    "1 - Cantar Linea\n"
-                    "2 - Cantar Columna\n"
-                    "3 - Cantar Bingo\n"
-                    "4 - Mostrar puntaje parcial\n");
-            scanf("%d", &opcion);
-            switch(opcion){
-                case 0:
-                break;
-                case 1:
-                    system("cls");
-                    flagLinea=cantarLinea(jugador->cartones, flagLinea,jugador->cantCartones);
-                    if(flagLinea==1){
-                        jugador->puntos=puntajeFila(jugador->puntos);
-                    } else{
-                        i--;
-                    }
-                    system("pause");
-                    break;
-                case 2:
-                    system("cls");
-                    flagColumna=cantarColumna(jugador->cartones, flagColumna,jugador->cantCartones);
-                    if(flagColumna==1){
-                        jugador->puntos=puntajeColumna(jugador->puntos);
-                    } else {
-                        i--;
-                    }
-                    system("pause");
-                    break;
-                case 3:
-                    system("cls");
-                    flagBingo=cantarBingo(jugador->cartones, flagBingo,jugador->cantCartones);
-                    if(flagBingo==1){
-                        jugador->puntos=puntajeBingo(jugador->puntos);
-                        cantJugadas = i+1;
-                        jugador->puntos = multiplicarPuntos(jugador->puntos, cantJugadas);
-                        guardarPuntosEnF(jugador);
-                        printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador->nombreJugador, jugador->apellidoJugador);
-                        printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador->puntos);//Ponerlo en otro lugar??
-                    } else {
-                        i--;
-                    }
-                    system("pause");
-                    break;
-                case 4:
-                    system("cls");
-                    printf("\nPUNTAJE PARCIAL JUGADOR: %.2f"
-                            "\nPUNTAJE PARCIAL CPU: %.2f\n", jugador->puntos, cpu->puntos);
-                    i--;
-                    system("pause");
-                    break;
-                }
-                i++;
+        //Para la CPU, los puntajes son automaticos
+        //Para el usuario, se debe cantar linea/columna/bingo manualmente.
+        if(checkBingo(cpu->cartones,cpu->cantCartones)==1){
+            printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <CPU>\n");
+            cantJugadas = i+1;
+            cpu->puntos = multiplicarPuntos(cpu->puntos, cantJugadas);
+            printf(">PUNTAJE FINAL CPU: %.2f\n", cpu->puntos);
+            guardarPuntosEnF(cpu);
+            flagBingo = 1;
+            break; //Corta la itearcion
         }
+
+        printf("\n0 - CONTINUAR JUGADA\n" //Quiza modificar esto para que sea mejor, más comodo
+                "1 - Cantar Linea\n"
+                "2 - Cantar Columna\n"
+                "3 - Cantar Bingo\n"
+                "4 - Mostrar puntaje parcial\n");
+        scanf("%d", &opcion);
+        switch(opcion){
+            case 0:
+            break;
+            case 1:
+                system("cls");
+                if(cantarLinea(jugador->cartones, flagLinea,jugador->cantCartones)==1 &&
+                   flagLinea==0){
+                    jugador->puntos=puntajeFila(jugador->puntos);
+                    flagLinea=1;
+                }
+                i--;
+                system("pause");
+                break;
+            case 2:
+                system("cls");
+                if(cantarColumna(jugador->cartones, flagColumna,jugador->cantCartones)==1 &&
+                   flagColumna==0){
+                    jugador->puntos=puntajeColumna(jugador->puntos);
+                    flagColumna=1;
+                }
+                i--;
+                system("pause");
+                break;
+            case 3:
+                system("cls");
+                flagBingo=cantarBingo(jugador->cartones, flagBingo,jugador->cantCartones);
+                if(flagBingo==1){
+                    jugador->puntos=puntajeBingo(jugador->puntos);
+                    cantJugadas = i+1;
+                    jugador->puntos = multiplicarPuntos(jugador->puntos, cantJugadas);
+                    guardarPuntosEnF(jugador);
+                    printf("\n>>> PARTIDA FINALIZADA. GANADOR ---> <%s %s>. FELICITACIONES!\n", jugador->nombreJugador, jugador->apellidoJugador);
+                    printf("\n>PUNTAJE FINAL JUGADOR: %.2f\n", jugador->puntos);//Ponerlo en otro lugar??
+                }
+                i--;
+                system("pause");
+                break;
+            case 4:
+                system("cls");
+                printf("\nPUNTAJE PARCIAL JUGADOR: %.2f"
+                        "\nPUNTAJE PARCIAL CPU: %.2f\n", jugador->puntos, cpu->puntos);
+                i--;
+                system("pause");
+                break;
+            }
+            i++;
     }
     //elimina de ram los datos
     for(int i=0;i<jugador->cantCartones;i++){
@@ -359,13 +355,13 @@ void jugar(){
 }
 
 float puntajeColumna(float p){
-    return p+=10;
+    return p+10;
 }
 float puntajeFila(float p){
-    return p+=20;
+    return p+20;
 }
 float puntajeBingo(float p){
-    return p+=70;
+    return p+70;
 }
 
 

@@ -20,23 +20,20 @@ struct Cartones
     int bingo;
 
 };
-float puntajeParcialAutomaticoCPU(Carton cartones[],int cantCartones){
-    int flagColum=0;
-    int flagFil=0;
-    int flagBingo=0;
+float puntajeParcialAutomaticoCPU(Carton cartones[],int cantCartones,int *flagColum,int *flagFil,int *flagBingo){
     float puntaje=0;
     for(int i=0; i<cantCartones; i++){
         if((checkColumna(cartones[i]->carton)==1)&&(flagColum==0)){
-            flagColum=1;
+            (*flagColum)=1;
             puntaje+=10;
         }
         if((checkFila(cartones[i]->carton)==1)&&(flagFil==0)){
-            flagFil=1;
+            (*flagFil)=1;
             puntaje+=20;
         }
     }
-    if((checkBingo(cartones,cantCartones)==1)&&(flagBingo==0)){
-        flagBingo=1;
+    if((checkBingo(cartones,cantCartones)==1) && (flagBingo==0)){
+        (*flagBingo)=1;
         puntaje+=70;
     }
     return puntaje;
@@ -122,30 +119,32 @@ void checkAciertos(Carton cartones[], int cantCartones, int numeroBolsa){
 	}
 }
 int cantarColumna(Carton cartones[], int flag,int cantCartones){
+    int col=0;
     for(int i=0; i<cantCartones; i++){
         if((checkColumna(cartones[i]->carton)==1)&&(flag==0)){
             printf(">>Felicidades, ha cantado columna!!\n");
-            flag = 1;
+            col = 1;
         } else if ((checkColumna(cartones[i]->carton)==1)&&(flag==1)){
             printf(">>Usted ya ha cantado columna.\n");
         } else if(checkColumna(cartones[i]->carton)!=1){
             printf(">>Usted no puede cantar columna todavia.\n");
         }
     }
-    return flag;
+    return col;
 }
 int cantarLinea(Carton cartones[], int flag,int cantCartones){
+    int fil=0;
     for(int i=0; i<cantCartones; i++){
         if((checkFila(cartones[i]->carton)==1)&&(flag==0)){
             printf(">>Felicidades, ha cantado linea!!\n");
-            flag = 1;
+            fil = 1;
         } else if ((checkFila(cartones[i]->carton)==1)&&(flag==1)){
             printf(">>Usted ya ha cantado linea.\n");
         } else if(checkFila(cartones[i]->carton)!=1){
             printf(">>Usted no puede cantar linea todavia.\n");
         }
     }
-    return flag;
+    return fil;
 }
 void inicializarVacio(int carton[][COLUMNA]){
     for (int f=0; f<FILA; f++){
@@ -155,7 +154,7 @@ void inicializarVacio(int carton[][COLUMNA]){
         }
 }
 
-int checkColumna(int c[FILA][COLUMNA]){
+int checkFila(int c[FILA][COLUMNA]){
     int contadorColum = 0;
     for(int fil=0; fil<FILA; fil++){
         for(int col=0; col<COLUMNA; col++){
@@ -170,7 +169,7 @@ int checkColumna(int c[FILA][COLUMNA]){
     }
     return 0;
 }
-int checkFila(int c[FILA][COLUMNA]){
+int checkColumna(int c[FILA][COLUMNA]){
     int contadorFila = 0;
     for(int col=0; col<COLUMNA; col++){
         for(int fil=0; fil<FILA; fil++){
@@ -187,15 +186,21 @@ int checkFila(int c[FILA][COLUMNA]){
 }
 int checkBingo(Carton cartones[],int cantCartones){
     for(int i=0; i<cantCartones; i++){
+        int bingo=1;
         for(int fil=0; fil<FILA; fil++){
             for(int col=0; col<COLUMNA; col++){
                 if(cartones[i]->carton[fil][col]!=-1){
-                    return 0; //Como en el bingo todos los valores deben ser -1, al primero que no sea, corta la funcion.
+                    bingo=0; //Como en el bingo todos los valores deben ser -1, al primero que no sea, ya no es bingo
                 }
             }
         }
+        //Si ese carton tiene bingo devuelve 1
+        if(bingo==1){
+            return 1;
+        }
     }
-    return 1;
+    //Si llega a esta instancia ningun carton tiene bingo
+    return 0;
 }
 int cantarBingo(Carton cartones[], int flag,int cantCartones){
     int bingo=checkBingo(cartones,cantCartones);
